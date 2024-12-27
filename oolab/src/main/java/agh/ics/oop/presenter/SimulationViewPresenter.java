@@ -116,52 +116,6 @@ public class SimulationViewPresenter implements MapChangeListener {
         });
     }
 
-<<<<<<< Updated upstream:oolab/src/main/java/agh/ics/oop/presenter/SimulationPresenter.java
-
-    public void onSimulationStartClicked(ActionEvent actionEvent) {
-        List<MoveDirection> directions =  parse(List.of(moveList.getText().split(" ")));
-        AbstractWorldMap map = new GrassField(10);
-        List<Vector2d> positions = List.of(new Vector2d(1,1),new Vector2d(3,5));
-        map.addObserver(new ConsoleMapDisplay());
-
-        Simulation simulation = new Simulation(positions,directions,map);
-        this.setWorldMap(map);
-        map.addObserver(this);
-=======
-
-//    public void onSimulationStartClicked(ActionEvent actionEvent) {
-//        try {
-//            // Wczytanie nowego FXML dla okna symulacji
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/SimulationView.fxml"));
-//            BorderPane simulationRoot = loader.load();
-//
-//            // Pobranie kontrolera dla nowego widoku symulacji
-//            SimulationViewPresenter simulationPresenter = loader.getController();
-//
-//            // Przygotowanie mapy i symulacji
-//            List<MoveDirection> directions = parse(List.of(moveList.getText().split(" ")));
-//            AbstractWorldMap map = new GrassField(10);
-//            List<Vector2d> positions = List.of(new Vector2d(1, 1), new Vector2d(3, 5));
-//            map.addObserver(new ConsoleMapDisplay());
-//
-//            Simulation simulation = new Simulation(positions, directions, map);
-//            simulationPresenter.setWorldMap(map); // Przekazanie mapy do drugiego kontrolera
-//            map.addObserver(simulationPresenter);
-//
-//            SimulationEngine simulationEngine = new SimulationEngine(List.of(simulation));
-//            new Thread(simulationEngine::runSync).start();
-//
-//            // Stworzenie nowego Stage
-//            Stage simulationStage = new Stage();
-//            simulationStage.setTitle("Simulation");
-//            simulationStage.setScene(new Scene(simulationRoot));
-//            simulationStage.show();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public void initializeSimulation(String moves) {
         List<MoveDirection> directions = OptionsParser.parse(List.of(moves.split(" ")));
         AbstractWorldMap map = new GrassField(10);
@@ -170,8 +124,6 @@ public class SimulationViewPresenter implements MapChangeListener {
 
         Simulation simulation = new Simulation(positions, directions, map);
         this.setWorldMap(map);
-
->>>>>>> Stashed changes:oolab/src/main/java/agh/ics/oop/presenter/SimulationViewPresenter.java
         SimulationEngine simulationEngine = new SimulationEngine(List.of(simulation));
         new Thread(simulationEngine::runSync).start();
     }

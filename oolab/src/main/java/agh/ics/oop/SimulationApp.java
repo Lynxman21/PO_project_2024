@@ -1,12 +1,7 @@
 package agh.ics.oop;
 
-<<<<<<< Updated upstream
-import agh.ics.oop.model.*;
-import agh.ics.oop.presenter.SimulationPresenter;
-=======
 import agh.ics.oop.presenter.MainViewPresenter;
 import agh.ics.oop.presenter.SimulationViewPresenter;
->>>>>>> Stashed changes
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -22,11 +17,7 @@ public class SimulationApp extends javafx.application.Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader();
-<<<<<<< Updated upstream
-        loader.setLocation(getClass().getClassLoader().getResource("simulation.fxml"));
-=======
         loader.setLocation(getClass().getClassLoader().getResource("MainView.fxml"));
->>>>>>> Stashed changes
         BorderPane viewRoot = loader.load();
         MainViewPresenter presenter = loader.getController();
         configureStage(primaryStage,viewRoot);

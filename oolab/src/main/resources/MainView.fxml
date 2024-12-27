@@ -17,11 +17,4 @@
             <Button text="Start" onAction="#onSimulationStartClicked"/>
         </VBox>
     </top>
-<<<<<<<< Updated upstream:oolab/src/main/resources/simulation.fxml
-    <center>
-        <GridPane fx:id="mapGrid" gridLinesVisible="true" alignment="CENTER"/>
-    </center>
 </BorderPane>
-========
-</BorderPane>
->>>>>>>> Stashed changes:oolab/src/main/resources/MainView.fxml
