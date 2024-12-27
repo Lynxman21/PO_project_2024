@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -19,6 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
@@ -26,6 +28,7 @@ import static agh.ics.oop.OptionsParser.parse;
 
 public class SimulationPresenter implements MapChangeListener {
     private WorldMap map;
+    private Stage stage;
 
     @FXML
     private Label infoLabel;
@@ -46,6 +49,10 @@ public class SimulationPresenter implements MapChangeListener {
     private int xMax;
     private int yMin;
     private int yMax;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 
     public void setWorldMap(WorldMap map) {
         this.map = map;
@@ -68,27 +75,27 @@ public class SimulationPresenter implements MapChangeListener {
     }
 
     private void addCollumnsAndRows() {
-        for (int index=0;index<mapWidth;index++) {
+        for (int index = 0; index < mapWidth; index++) {
             mapGrid.getColumnConstraints().add(new ColumnConstraints(widthCeil));
-            Label labelW = new Label(Integer.toString(boundary.lowerLeft().getX() + index+1));
-            mapGrid.add(labelW,index+1,0);
+            Label labelW = new Label(Integer.toString(boundary.lowerLeft().getX() + index + 1));
+            mapGrid.add(labelW, index + 1, 0);
             GridPane.setHalignment(labelW, HPos.CENTER);
         }
-        for (int index=0;index<mapHeight;index++) {
+        for (int index = 0; index < mapHeight; index++) {
             mapGrid.getRowConstraints().add(new RowConstraints(heightCeil));
-            Label labelH = new Label(Integer.toString(boundary.lowerLeft().getY() + index+1));
-            mapGrid.add(labelH,0,index+1);
+            Label labelH = new Label(Integer.toString(boundary.lowerLeft().getY() + index + 1));
+            mapGrid.add(labelH, 0, index + 1);
             GridPane.setHalignment(labelH, HPos.CENTER);
         }
     }
 
     private void addElements() {
-        for (int w=xMin;w<=xMax;w++) {
-            for (int h=yMin;h<=yMax;h++) {
-                Vector2d position = new Vector2d(w,h);
+        for (int w = xMin; w <= xMax; w++) {
+            for (int h = yMin; h <= yMax; h++) {
+                Vector2d position = new Vector2d(w, h);
                 if (map.isOccupied(position)) {
                     Label label = new Label(map.objectAt(position).toString());
-                    mapGrid.add(label,w-xMin+1,yMax-h+1);
+                    mapGrid.add(label, w - xMin + 1, yMax - h + 1);
                     mapGrid.setHalignment(mapGrid.getChildren().get(mapGrid.getChildren().size() - 1), HPos.CENTER);
                 }
             }
@@ -117,17 +124,36 @@ public class SimulationPresenter implements MapChangeListener {
         });
     }
 
-
     public void onSimulationStartClicked(ActionEvent actionEvent) {
-        List<MoveDirection> directions =  parse(List.of(moveList.getText().split(" ")));
-        AbstractWorldMap map = new GrassField(10);
-        List<Vector2d> positions = List.of(new Vector2d(1,1),new Vector2d(3,5));
-        map.addObserver(new ConsoleMapDisplay());
+        try {
+            // Wczytanie nowego FXML dla okna symulacji
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/board.fxml"));
+            BorderPane simulationRoot = loader.load();
 
-        Simulation simulation = new Simulation(positions,directions,map);
-        this.setWorldMap(map);
-        map.addObserver(this);
-        SimulationEngine simulationEngine = new SimulationEngine(List.of(simulation));
-        new Thread(simulationEngine::runSync).start();
+            // Pobranie kontrolera dla nowego widoku symulacji
+            SimulationPresenter simulationPresenter = loader.getController();
+
+            // Przygotowanie mapy i symulacji
+            List<MoveDirection> directions = parse(List.of(moveList.getText().split(" ")));
+            AbstractWorldMap map = new GrassField(10);
+            List<Vector2d> positions = List.of(new Vector2d(1, 1), new Vector2d(3, 5));
+            map.addObserver(new ConsoleMapDisplay());
+
+            Simulation simulation = new Simulation(positions, directions, map);
+            simulationPresenter.setWorldMap(map); // Przekazanie mapy do drugiego kontrolera
+            map.addObserver(simulationPresenter);
+
+            SimulationEngine simulationEngine = new SimulationEngine(List.of(simulation));
+            new Thread(simulationEngine::runSync).start();
+
+            // Stworzenie nowego Stage
+            Stage simulationStage = new Stage();
+            simulationStage.setTitle("Simulation");
+            simulationStage.setScene(new Scene(simulationRoot));
+            simulationStage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
