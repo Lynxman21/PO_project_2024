@@ -31,6 +31,15 @@ public class Animal implements WorldElement {
         return position;
     }
 
+    public void setPosition(Vector2d position) {
+        this.position = position;
+    }
+    public void rotate(int count) {
+        for (int index=0;index<count;index++) {
+            direction = direction.next();
+        }
+    }
+
     //za pomocą tych funkcji co były np na lewo czy na prawo
     public void move(MoveDirection direction, MoveValidator validator) {
         Vector2d newPosition;

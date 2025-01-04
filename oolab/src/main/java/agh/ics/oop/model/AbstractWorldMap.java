@@ -11,7 +11,7 @@ import java.util.Map;
 
 public abstract class AbstractWorldMap implements WorldMap{
     protected Map<Vector2d,Animal> animals = new HashMap<>();
-    protected List<MapChangeListener> observers = new ArrayList<>();
+    protected List<MapChangeListener>observers;
     protected MapVisualizer vizulizer;
     protected final int id;
 
@@ -19,7 +19,12 @@ public abstract class AbstractWorldMap implements WorldMap{
         this.animals = animals;
         this.vizulizer = new MapVisualizer(this);
         this.id = this.hashCode();
+        this.observers = new ArrayList<>();
     }
+
+    public abstract void growPlants();
+
+    public abstract void growPlants(int initialCount);
 
     @Override
     public int getId() {
@@ -34,7 +39,7 @@ public abstract class AbstractWorldMap implements WorldMap{
         observers.remove(observer);
     }
 
-    private void informObservers(String message) {
+    protected void informObservers(String message) {
         for (MapChangeListener observer : observers) {
             observer.mapChanged(this,message);
         }
