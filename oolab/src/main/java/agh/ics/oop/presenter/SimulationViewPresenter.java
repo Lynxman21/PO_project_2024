@@ -20,11 +20,10 @@ import javafx.scene.layout.RowConstraints;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Vector;
 
 import static agh.ics.oop.OptionsParser.parse;
 
-public class SimulationPresenter implements MapChangeListener {
+public class SimulationViewPresenter implements MapChangeListener {
     private WorldMap map;
 
     @FXML
@@ -117,16 +116,14 @@ public class SimulationPresenter implements MapChangeListener {
         });
     }
 
-
-    public void onSimulationStartClicked(ActionEvent actionEvent) {
-        List<MoveDirection> directions =  parse(List.of(moveList.getText().split(" ")));
+    public void initializeSimulation(String moves) {
+        List<MoveDirection> directions = OptionsParser.parse(List.of(moves.split(" ")));
         AbstractWorldMap map = new GrassField(10);
-        List<Vector2d> positions = List.of(new Vector2d(1,1),new Vector2d(3,5));
-        map.addObserver(new ConsoleMapDisplay());
+        List<Vector2d> positions = List.of(new Vector2d(1, 1), new Vector2d(3, 5));
+        map.addObserver(this); // Obserwacja mapy
 
-        Simulation simulation = new Simulation(positions,directions,map);
+        Simulation simulation = new Simulation(positions, directions, map);
         this.setWorldMap(map);
-        map.addObserver(this);
         SimulationEngine simulationEngine = new SimulationEngine(List.of(simulation));
         new Thread(simulationEngine::runSync).start();
     }

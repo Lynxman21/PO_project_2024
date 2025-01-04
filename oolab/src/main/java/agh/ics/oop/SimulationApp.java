@@ -1,7 +1,7 @@
 package agh.ics.oop;
 
-import agh.ics.oop.model.*;
-import agh.ics.oop.presenter.SimulationPresenter;
+import agh.ics.oop.presenter.MainViewPresenter;
+import agh.ics.oop.presenter.SimulationViewPresenter;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -17,9 +17,9 @@ public class SimulationApp extends javafx.application.Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getClassLoader().getResource("simulation.fxml"));
+        loader.setLocation(getClass().getClassLoader().getResource("MainView.fxml"));
         BorderPane viewRoot = loader.load();
-        SimulationPresenter presenter = loader.getController();
+        MainViewPresenter presenter = loader.getController();
         configureStage(primaryStage,viewRoot);
         primaryStage.show();
     }
