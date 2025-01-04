@@ -1,5 +1,7 @@
 package agh.ics.oop;
 
+import agh.ics.oop.model.EquatorialForest;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -19,8 +21,14 @@ public class SimulationEngine {
     public void runSync() {
         for (Simulation sim : simulations) {
             sim.run();
+
+            // Losowy wzrost roślin po każdym ruchu
+            if (sim.getMap() instanceof EquatorialForest) {
+                ((EquatorialForest) sim.getMap()).growPlants(); // Domyślne wywołanie
+            }
         }
     }
+
 
     public void runAsync() {
         for (Simulation sim : simulations) {

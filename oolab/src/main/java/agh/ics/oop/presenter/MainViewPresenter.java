@@ -11,30 +11,59 @@ import javafx.stage.Stage;
 public class MainViewPresenter {
 
     @FXML
-    private TextField moveList;
+    private TextField mapWidthField;
+
+    @FXML
+    private TextField mapHeightField;
+
+    @FXML
+    private TextField animalCountField;
+
+    @FXML
+    private TextField plantCountField;
 
     @FXML
     private Label infoLabel;
 
     public void onSimulationStartClicked(ActionEvent actionEvent) {
         try {
+            // Pobierz parametry mapy i symulacji
+            int mapWidth = Integer.parseInt(mapWidthField.getText().trim());
+            int mapHeight = Integer.parseInt(mapHeightField.getText().trim());
+            int numberOfAnimals = Integer.parseInt(animalCountField.getText().trim());
+            int numberOfPlants = Integer.parseInt(plantCountField.getText().trim());
+
+            // Walidacja danych
+            if (mapWidth <= 0 || mapHeight <= 0) {
+                infoLabel.setText("Error: Map dimensions must be greater than 0.");
+                return;
+            }
+            if (numberOfAnimals <= 0) {
+                infoLabel.setText("Error: Number of animals must be greater than 0.");
+                return;
+            }
+            if (numberOfPlants < 0) {
+                infoLabel.setText("Error: Number of plants cannot be negative.");
+                return;
+            }
+
             // Wczytanie widoku symulacji
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/SimulationView.fxml"));
             Stage simulationStage = new Stage();
             simulationStage.setScene(new Scene(loader.load()));
             simulationStage.setTitle("Simulation");
 
-            // Pobranie kontrolera widoku symulacji
-            SimulationViewPresenter simulationPresenter = loader.getController();
-
             // Przekazanie danych do symulacji
-            String moves = moveList.getText(); // Pobierz tekst z pola
-            simulationPresenter.initializeSimulation(moves);
+            SimulationViewPresenter simulationPresenter = loader.getController();
+            simulationPresenter.initializeSimulation(mapWidth, mapHeight, numberOfAnimals, numberOfPlants);
 
             // Otwórz okno symulacji
             simulationStage.show();
+        } catch (NumberFormatException e) {
+            infoLabel.setText("Error: Please enter valid numerical values.");
         } catch (Exception e) {
             e.printStackTrace();
+            infoLabel.setText("Unexpected error occurred.");
         }
     }
 }

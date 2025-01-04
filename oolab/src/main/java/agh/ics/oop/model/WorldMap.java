@@ -45,4 +45,5 @@ public interface WorldMap extends agh.ics.oop.model.MoveValidator {
      * @return animal or null if the position is not occupied.
      */
     WorldElement objectAt(Vector2d position);
+
 }
