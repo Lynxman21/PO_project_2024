@@ -1,9 +1,19 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.model.util.EcosystemManager;
+
+import java.util.Map;
+
 public class EarthMap extends EquatorialForest {
+    private final EcosystemManager manager;
 
     public EarthMap(int width, int height) {
         super(width, height);
+        manager = new EcosystemManager(this);
+    }
+
+    public Map<Vector2d, Plant> getPlants() {
+        return plants;
     }
 
     @Override
@@ -37,15 +47,15 @@ public class EarthMap extends EquatorialForest {
             // Usuwanie roślin po wejściu zwierzęcia na pole
             Plant plant = plants.get(newPosition);
             if (plant != null) {
-                if (plant.isLarge()) {
-                    for (Vector2d field : plant.getArea()) {
-                        plants.remove(field);
-                    }
-                } else {
-                    plants.remove(newPosition);
-                }
+                System.out.println("Przed");
+                System.out.println(animal.getEnergy());
+                manager.plantConsume(animal,plant);
+                System.out.println("Po");
+                System.out.println(animal.getEnergy());
             }
 
+            animal.incrementEnergy(-1);
+            manager.isAnimalAlive(animal);
             informObservers("Animal moved to: " + newPosition);
         }
     }

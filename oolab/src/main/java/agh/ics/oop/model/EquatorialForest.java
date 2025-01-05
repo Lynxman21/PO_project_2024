@@ -8,7 +8,7 @@ public class EquatorialForest extends AbstractWorldMap {
 
     protected final int width;
     protected final int height;
-    protected final Map<Vector2d, Plant> plants = new HashMap<>();
+    protected Map<Vector2d, Plant> plants = new HashMap<>();
     protected final Random random = new Random();
     protected final Set<Vector2d> preferredFields = new HashSet<>();
     protected final Set<Vector2d> nonPreferredFields = new HashSet<>();
@@ -18,6 +18,10 @@ public class EquatorialForest extends AbstractWorldMap {
         this.width = width;
         this.height = height;
         initializeFields();
+    }
+
+    public void removePlant(Vector2d position) {
+        this.plants.remove(position);
     }
 
     private void initializeFields() {

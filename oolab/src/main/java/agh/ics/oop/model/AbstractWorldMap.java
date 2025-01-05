@@ -22,6 +22,10 @@ public abstract class AbstractWorldMap implements WorldMap{
         this.observers = new ArrayList<>();
     }
 
+    public void removeAnimal(Vector2d pos) {
+        animals.remove(pos);
+    }
+
     public abstract void growPlants();
 
     public abstract void growPlants(int initialCount);

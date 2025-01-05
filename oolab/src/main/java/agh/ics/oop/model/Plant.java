@@ -2,14 +2,22 @@
 package agh.ics.oop.model;
 
 import java.util.List;
+import java.util.Random;
 
 public class Plant implements WorldElement {
     private final Vector2d position;
     private final boolean isLarge;
+    private final int energyValue;
+
+    public int getEnergyValue() {
+        return energyValue;
+    }
 
     public Plant(Vector2d position, boolean isLarge) {
+        Random random = new Random();
         this.position = position;
         this.isLarge = isLarge;
+        this.energyValue = isLarge ? random.nextInt((20-5) + 1) + 5 : random.nextInt((20-5) + 1) + 5 + 20;
     }
 
     public boolean isLarge() {

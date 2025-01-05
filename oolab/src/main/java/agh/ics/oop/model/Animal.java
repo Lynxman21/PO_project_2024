@@ -1,16 +1,30 @@
 package agh.ics.oop.model;
 
+import java.util.Random;
+
 public class Animal implements WorldElement {
     private static final Vector2d LEFT_BOTTOM_CORNER = new Vector2d(0,0);
     private static final Vector2d RIGHT_UP_CORNER = new Vector2d(4,4);
 
     private MapDirection direction;
     private Vector2d position;
+    private int energy;
 
     public Animal(Vector2d position) {
+        Random random = new Random();
         this.direction = MapDirection.NORTH;
         this.position = position;
+        this.energy = random.nextInt((100-10) + 1) + 10;
     }
+
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void incrementEnergy(int increment) {
+        this.energy += increment;
+    }
+
     public Animal() {
         this(new Vector2d(2,2));
     }
@@ -34,6 +48,7 @@ public class Animal implements WorldElement {
     public void setPosition(Vector2d position) {
         this.position = position;
     }
+
     public void rotate(int count) {
         for (int index=0;index<count;index++) {
             direction = direction.next();
