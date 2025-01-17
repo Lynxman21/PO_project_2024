@@ -11,6 +11,10 @@ import javafx.stage.Stage;
 public class MainViewPresenter {
 
     @FXML
+    private TextField plantEnergy;
+    @FXML
+    private TextField animalEnergy;
+    @FXML
     private TextField mapWidthField;
 
     @FXML
@@ -32,6 +36,8 @@ public class MainViewPresenter {
             int mapHeight = Integer.parseInt(mapHeightField.getText().trim());
             int numberOfAnimals = Integer.parseInt(animalCountField.getText().trim());
             int numberOfPlants = Integer.parseInt(plantCountField.getText().trim());
+            int numberOfPlantEnergy = Integer.parseInt(plantEnergy.getText().trim());
+            int numberOfAnimalEnergy = Integer.parseInt(animalEnergy.getText().trim());
 
             // Walidacja danych
             if (mapWidth <= 0 || mapHeight <= 0) {
@@ -46,6 +52,15 @@ public class MainViewPresenter {
                 infoLabel.setText("Error: Number of plants cannot be negative.");
                 return;
             }
+            if (numberOfPlantEnergy < 0) {
+                infoLabel.setText("Error: Number of energy from plants cannot be negative.");
+                return;
+            }
+            if (numberOfAnimalEnergy < 0) {
+                infoLabel.setText("Error: Number of animal's energy cannot be negative.");
+                return;
+            }
+
 
             // Wczytanie widoku symulacji
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/SimulationView.fxml"));
@@ -55,7 +70,7 @@ public class MainViewPresenter {
 
             // Przekazanie danych do symulacji
             SimulationViewPresenter simulationPresenter = loader.getController();
-            simulationPresenter.initializeSimulation(mapWidth, mapHeight, numberOfAnimals, numberOfPlants);
+            simulationPresenter.initializeSimulation(mapWidth, mapHeight, numberOfAnimals, numberOfPlants,numberOfPlantEnergy,numberOfAnimalEnergy);
 
             // Otwórz okno symulacji
             simulationStage.show();

@@ -24,7 +24,7 @@ public abstract class AbstractWorldMap implements WorldMap{
 
     public abstract void growPlants();
 
-    public abstract void growPlants(int initialCount);
+    public abstract void growPlants(int initialCount,int energy);
 
     @Override
     public int getId() {

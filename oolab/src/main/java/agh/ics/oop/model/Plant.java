@@ -1,15 +1,26 @@
 // Klasa reprezentująca roślinę
 package agh.ics.oop.model;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+
 import java.util.List;
 
 public class Plant implements WorldElement {
+
     private final Vector2d position;
     private final boolean isLarge;
 
+<<<<<<< Updated upstream
     public Plant(Vector2d position, boolean isLarge) {
         this.position = position;
         this.isLarge = isLarge;
+=======
+    public Plant(Vector2d position, boolean isLarge,int energyValue) {
+        this.position = position;
+        this.isLarge = isLarge;
+        this.energyValue = isLarge ? energyValue + 20 : energyValue;
+>>>>>>> Stashed changes
     }
 
     public boolean isLarge() {

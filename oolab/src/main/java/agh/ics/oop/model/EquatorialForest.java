@@ -1,11 +1,12 @@
 package agh.ics.oop.model;
 
 import agh.ics.oop.model.util.Boundary;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
 
 import java.util.*;
 
 public class EquatorialForest extends AbstractWorldMap {
-
     protected final int width;
     protected final int height;
     protected final Map<Vector2d, Plant> plants = new HashMap<>();
@@ -44,10 +45,10 @@ public class EquatorialForest extends AbstractWorldMap {
 
     @Override
     public void growPlants() {
-        growPlants(0); // Domyślne wywołanie z `initialCount = 0` - potrzebne do generowanie drzew na starcie i potem losowo
+        growPlants(0,10); // Domyślne wywołanie z `initialCount = 0` oraz `energy = 10` - potrzebne do generowanie drzew na starcie i potem losowo
     }
 
-    public void growPlants(int initialCount) {
+    public void growPlants(int initialCount, int energy) {
         // Usuń rośliny zajęte przez zwierzęta
         plants.entrySet().removeIf(entry -> animals.containsKey(entry.getKey()));
 
@@ -69,15 +70,15 @@ public class EquatorialForest extends AbstractWorldMap {
                 boolean isLarge = preferPreferred && random.nextDouble() < 0.2; // 20% szans na dużą roślinę
 
                 if (isLarge) {
-                    List<Vector2d> area = new Plant(position, true).getArea();
+                    List<Vector2d> area = new Plant(position, true, energy).getArea();
                     if (area.stream().allMatch(field -> !plants.containsKey(field))) {
-                        Plant largePlant = new Plant(position, true);
+                        Plant largePlant = new Plant(position, true, energy);
                         for (Vector2d field : area) {
                             plants.put(field, largePlant);
                         }
                     }
                 } else {
-                    plants.put(position, new Plant(position, false));
+                    plants.put(position, new Plant(position, false,energy));
                 }
             }
         }

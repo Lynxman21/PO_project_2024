@@ -7,12 +7,20 @@ public class Animal implements WorldElement {
     private MapDirection direction;
     private Vector2d position;
 
+<<<<<<< Updated upstream
     public Animal(Vector2d position) {
         this.direction = MapDirection.NORTH;
         this.position = position;
+=======
+    public Animal(Vector2d position,int energy) {
+        Random random = new Random();
+        this.direction = MapDirection.NORTH;
+        this.position = position;
+        this.energy = energy;
+>>>>>>> Stashed changes
     }
     public Animal() {
-        this(new Vector2d(2,2));
+        this(new Vector2d(2,2),10);
     }
 
     @Override

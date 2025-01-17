@@ -20,6 +20,8 @@ public interface WorldMap extends agh.ics.oop.model.MoveValidator {
      */
     void place(Animal animal) throws IncorrectPositionException;
 
+    void removeAnimal(Vector2d pos);
+
     /**
      * Moves an animal (if it is present on the map) according to specified direction.
      * If the move is not possible, this method has no effect.

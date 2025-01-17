@@ -46,6 +46,11 @@ public class EarthMap extends EquatorialForest {
                 }
             }
 
+<<<<<<< Updated upstream
+=======
+            animal.incrementEnergy(-1);
+//            manager.isAnimalAlive(animal);
+>>>>>>> Stashed changes
             informObservers("Animal moved to: " + newPosition);
         }
     }
