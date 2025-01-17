@@ -22,9 +22,13 @@ public abstract class AbstractWorldMap implements WorldMap{
         this.observers = new ArrayList<>();
     }
 
+    public void removeAnimal(Vector2d pos) {
+        animals.remove(pos);
+    }
+
     public abstract void growPlants();
 
-    public abstract void growPlants(int initialCount);
+    public abstract void growPlants(int initialCount,int energy);
 
     @Override
     public int getId() {
@@ -81,12 +85,4 @@ public abstract class AbstractWorldMap implements WorldMap{
     public abstract Boundary getCurrentBounds();
 
     public abstract WorldElement objectAt(Vector2d position);
-<<<<<<< Updated upstream
-
-    public List<WorldElement> getElements() {
-        return new ArrayList<>(animals.values());
-    }
 }
-=======
-}
->>>>>>> Stashed changes
