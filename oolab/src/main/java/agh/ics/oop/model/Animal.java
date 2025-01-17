@@ -7,7 +7,12 @@ public class Animal implements WorldElement {
     private MapDirection direction;
     private Vector2d position;
 
+<<<<<<< Updated upstream
     public Animal(Vector2d position) {
+=======
+
+    public Animal(Vector2d position,int energy) {
+>>>>>>> Stashed changes
         this.direction = MapDirection.NORTH;
         this.position = position;
     }

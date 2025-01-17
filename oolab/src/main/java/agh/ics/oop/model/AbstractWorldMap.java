@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractWorldMap implements WorldMap{
-    protected Map<Vector2d,Animal> animals = new HashMap<>();
+    protected Map<Vector2d,List<Animal>> animals = new HashMap<>();
     protected List<MapChangeListener>observers;
     protected MapVisualizer vizulizer;
     protected final int id;
 
-    public AbstractWorldMap(Map<Vector2d, Animal> animals) {
+    public AbstractWorldMap(Map<Vector2d, List<Animal>> animals) {
         this.animals = animals;
         this.vizulizer = new MapVisualizer(this);
         this.id = this.hashCode();
@@ -49,7 +49,7 @@ public abstract class AbstractWorldMap implements WorldMap{
     public void place(Animal animal) throws IncorrectPositionException{
         Vector2d vect = animal.getPosition();
         if (this.canMoveTo(vect)) {
-            animals.put(vect, animal);
+            animals.put(vect, new ArrayList<Animal>(List.of(animal)));
             informObservers("Animal placed at: " + animal.getPosition());
         }
         else {
@@ -63,7 +63,7 @@ public abstract class AbstractWorldMap implements WorldMap{
         animal.move(direction, this);
         if (!oldPosition.equals(animal.getPosition())) {
             animals.remove(oldPosition);
-            animals.put(animal.getPosition(),animal);
+            animals.put(animal.getPosition(),new ArrayList<Animal>(List.of(animal)));
             informObservers("Animal moved to: " + animal.getPosition());
         }
     }
@@ -81,8 +81,12 @@ public abstract class AbstractWorldMap implements WorldMap{
     public abstract Boundary getCurrentBounds();
 
     public abstract WorldElement objectAt(Vector2d position);
+<<<<<<< Updated upstream
 
     public List<WorldElement> getElements() {
         return new ArrayList<>(animals.values());
     }
 }
+=======
+}
+>>>>>>> Stashed changes

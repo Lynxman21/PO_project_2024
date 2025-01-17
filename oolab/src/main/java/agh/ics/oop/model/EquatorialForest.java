@@ -91,7 +91,7 @@ public class EquatorialForest extends AbstractWorldMap {
 
     @Override
     public WorldElement objectAt(Vector2d position) {
-        if (animals.containsKey(position)) return animals.get(position);
+        if (animals.containsKey(position)) return animals.get(position).get(0);
         if (plants.containsKey(position)) return plants.get(position);
         return null;
     }
