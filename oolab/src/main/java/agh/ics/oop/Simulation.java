@@ -68,7 +68,6 @@ public class Simulation implements Runnable {
             System.out.println("Started thread for Animal " + animalIndex + " at position: " + animals.get(i).getPosition());
             if (i==animals.size()-1) {
                 stats.incrementDay();
-
             }
         }
 
@@ -99,6 +98,7 @@ public class Simulation implements Runnable {
 
             if (animal.getEnergy()<=0) {
                 map.removeAnimal(animal.getPosition());
+                break;
             }
 
             System.out.println("Animal " + animalIndex + " moved: " + direction + " to position " + animal.getPosition());
