@@ -154,7 +154,7 @@ public class SimulationViewPresenter implements MapChangeListener {
     }
 
 
-    public void initializeSimulation(int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants) {
+    public void initializeSimulation(int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants,int plantEnergy, int animalEnergy, int minEnergy) {
         PositionGenerator positionGenerator = new PositionGenerator(mapWidth, mapHeight);
 
         // Generuj pozycje startowe dla zwierząt
@@ -166,16 +166,16 @@ public class SimulationViewPresenter implements MapChangeListener {
         );
         System.out.println(directionSequences);
 
-        AbstractWorldMap map = new EarthMap(mapWidth, mapHeight);
+        AbstractWorldMap map = new EarthMap(mapWidth, mapHeight,minEnergy);
 
         // Dodaj początkowe rośliny
         if (map instanceof EquatorialForest) {
-            ((EquatorialForest) map).growPlants(numberOfPlants); // Dodaj rośliny na start
+            ((EquatorialForest) map).growPlants(numberOfPlants,plantEnergy); // Dodaj rośliny na start
         }
 
         map.addObserver(this);
 
-        Simulation simulation = new Simulation(animalPositions, directionSequences, map);
+        Simulation simulation = new Simulation(animalPositions, directionSequences, map,plantEnergy,animalEnergy,minEnergy);
         this.setWorldMap(map);
 
         new Thread(simulation).start();

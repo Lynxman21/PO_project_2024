@@ -4,13 +4,17 @@ import agh.ics.oop.model.util.EcosystemManager;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class EarthMap extends EquatorialForest {
     private final EcosystemManager manager;
+    private final int minEnergy;
 
-    public EarthMap(int width, int height) {
+    public EarthMap(int width, int height, int minEnergy) {
         super(width, height);
+        this.minEnergy = minEnergy;
         manager = new EcosystemManager(this);
     }
 
@@ -76,7 +80,7 @@ public class EarthMap extends EquatorialForest {
             animal.incrementEnergy(-1);
 //            manager.isAnimalAlive(animal);
             if (animal.getEnergy()<=0) {
-                this.removeAnimal(animal.getPosition());
+                this.removeAnimal(animal.getPosition(),animal);
             }
             informObservers("Animal moved to: " + newPosition);
         }
@@ -87,4 +91,53 @@ public class EarthMap extends EquatorialForest {
         return animals.containsKey(position) || plants.containsKey(position); // Sprawdza zajętość przez zwierzęta i rośliny
     }
 
+    public Animal reproduce(Animal parent1, Animal parent2) {
+        int childEnergy = 2*minEnergy;
+
+        parent1.incrementEnergy(-minEnergy);
+        parent2.incrementEnergy(-minEnergy);
+
+        ArrayList<MoveDirection> childGenotype = createChildGenotype(parent1, parent2);
+
+        Animal child = new Animal(parent1.getPosition(),childEnergy);
+        child.setMoves(childGenotype);
+        return child;
+    }
+
+    public ArrayList<MoveDirection> createChildGenotype(Animal parent1, Animal parent2) {
+        int totalEnergy = 2*minEnergy;
+        double ratioParent1 = (double) parent1.getEnergy() / totalEnergy;
+        double ratioParent2 = (double) parent2.getEnergy() / totalEnergy;
+
+        Random random = new Random();
+        boolean takeRightFromStronger = random.nextBoolean();
+
+        int breakpoint1 = (int) (parent1.getMoves().size() * ratioParent1);
+        int breakpoint2 = (int) (parent2.getMoves().size() * ratioParent2);
+
+        ArrayList<MoveDirection> childGenotype = new ArrayList<>();
+
+        if (takeRightFromStronger) {
+            childGenotype.addAll(parent1.getMoves().subList(0, breakpoint1));
+            childGenotype.addAll(parent2.getMoves().subList(breakpoint2, parent2.getMoves().size()));
+        } else {
+            childGenotype.addAll(parent2.getMoves().subList(0, breakpoint2));
+            childGenotype.addAll(parent1.getMoves().subList(breakpoint1, parent1.getMoves().size()));
+        }
+
+        mutateGenotype(childGenotype);
+
+        return childGenotype;
+    }
+
+    public static void mutateGenotype(ArrayList<MoveDirection> genotype) {
+        ArrayList<MoveDirection> m = new ArrayList<>(List.of(MoveDirection.FORWARD,MoveDirection.RIGHT,MoveDirection.BACKWARD,MoveDirection.LEFT));
+        Random random = new Random();
+        int numberOfMutations = random.nextInt(genotype.size());
+
+        for (int i = 0; i < numberOfMutations; i++) {
+            int mutationIndex = random.nextInt(genotype.size());
+            genotype.set(mutationIndex, m.get(random.nextInt(4)));
+        }
+    }
 }

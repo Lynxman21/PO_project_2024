@@ -10,11 +10,19 @@ public class Simulation implements Runnable {
     private final List<Animal> animals;
     private final List<List<MoveDirection>> directionSequences; // Sekwencje ruchów dla każdego zwierzaka
     private final WorldMap map;
+    private final int plantEnergy;
+    private final int animalEnergy;
+    private final int minEnergy;
+    private final Statistics stats;
 
-    public Simulation(List<Vector2d> startPositions, List<List<MoveDirection>> directionSequences, WorldMap map) {
+    public Simulation(List<Vector2d> startPositions, List<List<MoveDirection>> directionSequences, WorldMap map, int plantEnergy, int animalEnergy, int minEnergy) {
         this.animals = new ArrayList<>();
         this.directionSequences = directionSequences;
         this.map = map;
+        this.plantEnergy=plantEnergy;
+        this.animalEnergy=animalEnergy;
+        this.minEnergy=minEnergy;
+        this.stats = new Statistics();
 
         if (startPositions.size() != directionSequences.size()) {
             throw new IllegalArgumentException("Number of valid start positions must match the number of direction sequences.");
@@ -27,7 +35,7 @@ public class Simulation implements Runnable {
 
         for (Vector2d position : startPositions) {
             if (!map.isOccupied(position)) {
-                Animal animal = new Animal(position);
+                Animal animal = new Animal(position,animalEnergy);
                 try {
                     map.place(animal);
                     animals.add(animal);
@@ -62,6 +70,9 @@ public class Simulation implements Runnable {
             animalThreads.add(animalThread);
             animalThread.start();
             System.out.println("Started thread for Animal " + animalIndex + " at position: " + animals.get(i).getPosition());
+            if (i==animals.size()-1) {
+                stats.incrementDay();
+            }
         }
 
         // Czekaj na zakończenie wątków (te wątki nigdy się nie kończą)
@@ -82,12 +93,21 @@ public class Simulation implements Runnable {
     private void simulateAnimal(int animalIndex) {
         Animal animal = animals.get(animalIndex);
         List<MoveDirection> directions = directionSequences.get(animalIndex);
+        animal.setMoves(directions);
         int directionCount = directions.size();
+
+
 
         int step = 0;
         while (true) { // Nieskończona pętla
             MoveDirection direction = directions.get(step % directionCount); // Pobierz ruch w pętli
             map.move(animal, direction);
+
+            if (animal.getEnergy()<=0) {
+                map.removeAnimal(animal.getPosition(),animal);
+                directions.remove(animalIndex);
+                break;
+            }
 
             System.out.println("Animal " + animalIndex + " moved: " + direction + " to position " + animal.getPosition());
 

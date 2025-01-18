@@ -1,5 +1,7 @@
 package agh.ics.oop.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Animal implements WorldElement {
@@ -9,12 +11,18 @@ public class Animal implements WorldElement {
     private MapDirection direction;
     private Vector2d position;
     private int energy;
+    private List<MoveDirection> moves;
 
 
     public Animal(Vector2d position,int energy) {
         this.direction = MapDirection.NORTH;
         this.position = position;
         this.energy = energy;
+        this.moves = new ArrayList<>();
+    }
+
+    public void setMoves(List<MoveDirection> moves) {
+        this.moves = moves;
     }
 
     public int getEnergy() {
@@ -23,6 +31,10 @@ public class Animal implements WorldElement {
 
     public void incrementEnergy(int increment) {
         this.energy += increment;
+    }
+
+    public List<MoveDirection> getMoves() {
+        return moves;
     }
 
     public Animal() {
