@@ -1,11 +1,19 @@
 package agh.ics.oop.model;
 
-public class EarthMap extends EquatorialForest {
+import agh.ics.oop.model.util.EcosystemManager;
 
-    public EarthMap(int width, int height) {
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+public class EarthMap extends EquatorialForest {
+    private final EcosystemManager manager;
+    private final int minEnergy;
+
+    public EarthMap(int width, int height, int minEnergy) {
         super(width, height);
-<<<<<<< Updated upstream
-=======
         this.minEnergy = minEnergy;
         manager = new EcosystemManager(this);
     }
@@ -13,7 +21,6 @@ public class EarthMap extends EquatorialForest {
 
     public Map<Vector2d, Plant> getPlants() {
         return plants;
->>>>>>> Stashed changes
     }
 
     @Override
@@ -35,20 +42,11 @@ public class EarthMap extends EquatorialForest {
             }
         }
 
-<<<<<<< Updated upstream
-        // Obrót dla północy i południa
-        if ((animal.getDirection() == MapDirection.NORTH && direction == MoveDirection.FORWARD && oldPosition.getY() == height - 1) ||
-                (animal.getDirection() == MapDirection.SOUTH && direction == MoveDirection.FORWARD && oldPosition.getY() == 0)) {
-            animal.rotate(2); // Obrót o 180 stopni
-        } else {
-            animal.move(direction, this); // Standardowy ruch
-=======
         // Wrapowanie w poziomie (lewo-prawo)
         if (newPosition.getX() >= width) {
             newPosition = new Vector2d(0, newPosition.getY()); // Przejście na lewą krawędź
         } else if (newPosition.getX() < 0) {
             newPosition = new Vector2d(width - 1, newPosition.getY()); // Przejście na prawą krawędź
->>>>>>> Stashed changes
         }
 
         // Odbijanie w pionie (góra-dół)
@@ -62,10 +60,6 @@ public class EarthMap extends EquatorialForest {
 
         // Aktualizacja pozycji na mapie
         if (!oldPosition.equals(newPosition)) {
-<<<<<<< Updated upstream
-            animals.remove(oldPosition);
-            animals.put(newPosition, animal);
-=======
             // Usuń zwierzę ze starej pozycji
             List<Animal> animalsAtOldPosition = animals.get(oldPosition);
             if (animalsAtOldPosition != null) {
@@ -78,7 +72,6 @@ public class EarthMap extends EquatorialForest {
             // Dodaj zwierzę na nową pozycję
             animals.putIfAbsent(newPosition, new ArrayList<>());
             animals.get(newPosition).add(animal);
->>>>>>> Stashed changes
 
             // Aktualizuj pozycję zwierzęcia
             animal.setPosition(newPosition);
@@ -86,21 +79,8 @@ public class EarthMap extends EquatorialForest {
             // Sprawdź, czy na nowej pozycji jest roślina
             Plant plant = plants.get(newPosition);
             if (plant != null) {
-<<<<<<< Updated upstream
-                if (plant.isLarge()) {
-                    for (Vector2d field : plant.getArea()) {
-                        plants.remove(field);
-                    }
-                } else {
-                    plants.remove(newPosition);
-                }
-            }
-
-            informObservers("Animal moved to: " + newPosition);
-=======
                 manager.plantConsume(animal, plant); // Zwierzę konsumuje roślinę
             }
->>>>>>> Stashed changes
         }
 
         // Zmniejsz energię zwierzęcia za ruch
@@ -128,4 +108,53 @@ public class EarthMap extends EquatorialForest {
         return animals.containsKey(position) || plants.containsKey(position); // Sprawdza zajętość przez zwierzęta i rośliny
     }
 
+    public Animal reproduce(Animal parent1, Animal parent2) {
+        int childEnergy = 2*minEnergy;
+
+        parent1.incrementEnergy(-minEnergy);
+        parent2.incrementEnergy(-minEnergy);
+
+        ArrayList<MoveDirection> childGenotype = createChildGenotype(parent1, parent2);
+
+        Animal child = new Animal(parent1.getPosition(),childEnergy);
+        child.setMoves(childGenotype);
+        return child;
+    }
+
+    public ArrayList<MoveDirection> createChildGenotype(Animal parent1, Animal parent2) {
+        int totalEnergy = 2*minEnergy;
+        double ratioParent1 = (double) parent1.getEnergy() / totalEnergy;
+        double ratioParent2 = (double) parent2.getEnergy() / totalEnergy;
+
+        Random random = new Random();
+        boolean takeRightFromStronger = random.nextBoolean();
+
+        int breakpoint1 = (int) (parent1.getMoves().size() * ratioParent1);
+        int breakpoint2 = (int) (parent2.getMoves().size() * ratioParent2);
+
+        ArrayList<MoveDirection> childGenotype = new ArrayList<>();
+
+        if (takeRightFromStronger) {
+            childGenotype.addAll(parent1.getMoves().subList(0, breakpoint1));
+            childGenotype.addAll(parent2.getMoves().subList(breakpoint2, parent2.getMoves().size()));
+        } else {
+            childGenotype.addAll(parent2.getMoves().subList(0, breakpoint2));
+            childGenotype.addAll(parent1.getMoves().subList(breakpoint1, parent1.getMoves().size()));
+        }
+
+        mutateGenotype(childGenotype);
+
+        return childGenotype;
+    }
+
+    public static void mutateGenotype(ArrayList<MoveDirection> genotype) {
+        ArrayList<MoveDirection> m = new ArrayList<>(List.of(MoveDirection.FORWARD,MoveDirection.RIGHT,MoveDirection.BACKWARD,MoveDirection.LEFT));
+        Random random = new Random();
+        int numberOfMutations = random.nextInt(genotype.size());
+
+        for (int i = 0; i < numberOfMutations; i++) {
+            int mutationIndex = random.nextInt(genotype.size());
+            genotype.set(mutationIndex, m.get(random.nextInt(4)));
+        }
+    }
 }

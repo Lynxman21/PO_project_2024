@@ -171,12 +171,7 @@ public class SimulationViewPresenter implements MapChangeListener {
     }
 
 
-<<<<<<< Updated upstream
-    public void initializeSimulation(int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants) {
-        PositionGenerator positionGenerator = new PositionGenerator(mapWidth, mapHeight);
-=======
     private double cellSize; // Rozmiar komórki, obliczany dynamicznie
->>>>>>> Stashed changes
 
 
     public void initializeMap() {
@@ -304,18 +299,6 @@ public class SimulationViewPresenter implements MapChangeListener {
                 numberOfAnimals, 5, 20
         );
 
-<<<<<<< Updated upstream
-        AbstractWorldMap map = new EarthMap(mapWidth, mapHeight);
-
-        // Dodaj początkowe rośliny
-        if (map instanceof EquatorialForest) {
-            ((EquatorialForest) map).growPlants(numberOfPlants); // Dodaj rośliny na start
-        }
-
-        map.addObserver(this);
-
-        Simulation simulation = new Simulation(animalPositions, directionSequences, map);
-=======
         AbstractWorldMap map = new EarthMap(mapWidth, mapHeight, minEnergy);
 
         // Dodaj początkowe rośliny
@@ -324,7 +307,6 @@ public class SimulationViewPresenter implements MapChangeListener {
         }
 
         map.addObserver(this);
->>>>>>> Stashed changes
         this.setWorldMap(map);
 
         // Wywołaj jednorazową inicjalizację mapy

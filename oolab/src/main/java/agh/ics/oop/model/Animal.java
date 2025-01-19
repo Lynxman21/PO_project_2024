@@ -1,26 +1,50 @@
 package agh.ics.oop.model;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class Animal implements WorldElement {
-    private static final Vector2d LEFT_BOTTOM_CORNER = new Vector2d(0, 0);
-    private static final Vector2d RIGHT_UP_CORNER = new Vector2d(4, 4);
+    private static final Vector2d LEFT_BOTTOM_CORNER = new Vector2d(0,0);
+    private static final Vector2d RIGHT_UP_CORNER = new Vector2d(4,4);
 
     private MapDirection direction;
     private Vector2d position;
+    private int energy;
+    private List<MoveDirection> moves;
 
-    public Animal(Vector2d position) {
+
+    public Animal(Vector2d position,int energy) {
         this.direction = MapDirection.NORTH;
         this.position = position;
+        this.energy = energy;
+        this.moves = new ArrayList<>();
+    }
+
+    public void setMoves(List<MoveDirection> moves) {
+        this.moves = moves;
+    }
+
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void incrementEnergy(int increment) {
+        this.energy += increment;
+    }
+
+    public List<MoveDirection> getMoves() {
+        return moves;
     }
 
     public Animal() {
-        this(new Vector2d(2, 2));
+        this(new Vector2d(2,2),10);
     }
 
     @Override
     public String toString() {
         return this.direction.toString();
     }
-
     public boolean isAt(Vector2d position) {
         return this.position.equals(position);
     }
@@ -38,7 +62,7 @@ public class Animal implements WorldElement {
     }
 
     public void rotate(int count) {
-        for (int index = 0; index < count; index++) {
+        for (int index=0;index<count;index++) {
             direction = direction.next();
         }
     }
@@ -65,4 +89,6 @@ public class Animal implements WorldElement {
             this.position = newPosition; // Aktualizacja pozycji
         }
     }
+
+
 }
