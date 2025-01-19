@@ -68,27 +68,42 @@ public class Animal implements WorldElement {
     }
 
     //za pomocą tych funkcji co były np na lewo czy na prawo
-    public void move(MoveDirection direction, MoveValidator validator) {
-        Vector2d newPosition = this.position; // Domyślna nowa pozycja
-
-        switch (direction) {
-            case RIGHT -> this.direction = this.direction.next(); // Obrót w prawo
-            case LEFT -> this.direction = this.direction.previous(); // Obrót w lewo
-            case FORWARD -> {
-                Vector2d forwardVector = this.direction.toUnitVector();
-                newPosition = this.position.add(forwardVector);
-            }
-            case BACKWARD -> {
-                Vector2d backwardVector = this.direction.toUnitVector().opposite();
-                newPosition = this.position.add(backwardVector);
-            }
+    public void move(int direction, MoveValidator validator, int mapWidth, int mapHeight) {
+        // Obrót zwierzaka
+        for (int i = 0; i < direction; i++) {
+            this.direction = this.direction.next();
         }
 
-        // Sprawdź, czy nowa pozycja jest dozwolona przez mapę
+        // Oblicz nową pozycję
+        Vector2d newPosition = this.position.add(this.direction.toUnitVector());
+
+        // Wrapowanie w poziomie
+        if (newPosition.getX() >= mapWidth) {
+            newPosition = new Vector2d(0, newPosition.getY());
+        } else if (newPosition.getX() < 0) {
+            newPosition = new Vector2d(mapWidth - 1, newPosition.getY());
+        }
+
+        // Odbijanie w pionie
+        if (newPosition.getY() >= mapHeight || newPosition.getY() < 0) {
+            this.direction = this.direction.opposite(); // Obrót o 180°
+            newPosition = this.position; // Zwierzak zostaje w miejscu
+        }
+
+        // Sprawdź, czy nowa pozycja jest dostępna
         if (validator.canMoveTo(newPosition)) {
-            this.position = newPosition; // Aktualizacja pozycji
+            this.position = newPosition;
         }
+
+        // Zmniejszenie energii
+        this.energy--;
+
+        // Informacja debugowa
+        System.out.println("Animal moved to " + this.position + ", remaining energy: " + this.energy);
     }
+
+
+
 
 
 }

@@ -46,15 +46,28 @@ public class SimulationViewPresenter implements MapChangeListener {
         Platform.runLater(() -> {
             Stage stage = (Stage) mapGrid.getScene().getWindow();
             stage.setOnCloseRequest(event -> {
+                System.out.println("Close request received.");
+
                 if (simulation != null) {
-                    simulation.stop(); // Zatrzymaj symulację
+                    simulation.stop();
                     if (simulationThread != null && simulationThread.isAlive()) {
-                        simulationThread.interrupt(); // Przerwij wątek symulacji
+                        simulationThread.interrupt();
+                        System.out.println("Simulation thread interrupted.");
                     }
+                } else {
+                    System.out.println("Simulation or thread was null.");
                 }
             });
         });
     }
+
+
+
+
+
+
+
+
 
 
     private int widthCeil = 50;
@@ -249,7 +262,15 @@ public class SimulationViewPresenter implements MapChangeListener {
                 if (plant != null) {
                     Rectangle plantRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2); // Margines 2px
                     plantRectangle.setFill(plant.isLarge() ? javafx.scene.paint.Color.DARKGREEN : javafx.scene.paint.Color.LIGHTGREEN);
-                    mapGrid.add(plantRectangle, position.getX(), position.getY());
+
+                    // Przelicz współrzędne na GridPane
+                    int gridX = position.getX() - xMin;
+                    int gridY = yMax - position.getY();
+
+                    // Dodaj element do GridPane
+                    if (gridX >= 0 && gridY >= 0) { // Sprawdzamy, czy indeksy są poprawne
+                        mapGrid.add(plantRectangle, gridX, gridY);
+                    }
                 }
             }
         }
@@ -262,7 +283,15 @@ public class SimulationViewPresenter implements MapChangeListener {
                 if (animalsAtPosition != null && !animalsAtPosition.isEmpty()) {
                     Rectangle animalRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2); // Margines 2px
                     animalRectangle.setFill(javafx.scene.paint.Color.BURLYWOOD); // Kolor zwierząt
-                    mapGrid.add(animalRectangle, position.getX(), position.getY());
+
+                    // Przelicz współrzędne na GridPane
+                    int gridX = position.getX() - xMin;
+                    int gridY = yMax - position.getY();
+
+                    // Dodaj element do GridPane
+                    if (gridX >= 0 && gridY >= 0) { // Sprawdzamy, czy indeksy są poprawne
+                        mapGrid.add(animalRectangle, gridX, gridY);
+                    }
                 }
             }
         }
@@ -273,10 +302,10 @@ public class SimulationViewPresenter implements MapChangeListener {
 
 
 
-    private Thread simulationThread;
+
+    // Dodaj pole w klasie SimulationViewPresenter
     private Simulation simulation;
-
-
+    private Thread simulationThread;
 
     public void initializeSimulation(int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants, int plantEnergy, int animalEnergy, int minEnergy) {
         PositionGenerator positionGenerator = new PositionGenerator(mapWidth, mapHeight);
@@ -295,9 +324,14 @@ public class SimulationViewPresenter implements MapChangeListener {
         }
 
         // Generowanie sekwencji ruchów
-        List<List<MoveDirection>> directionSequences = SimulationInputGenerator.generateRandomMoveSequences(
+        List<List<Integer>> directionSequences = SimulationInputGenerator.generateRandomMoveSequences(
                 numberOfAnimals, 5, 20
         );
+
+// Walidacja, czy sekwencje zostały poprawnie wygenerowane
+        if (directionSequences.isEmpty() || directionSequences.stream().anyMatch(List::isEmpty)) {
+            throw new IllegalStateException("Direction sequences are invalid: empty sequences found.");
+        }
 
         AbstractWorldMap map = new EarthMap(mapWidth, mapHeight, minEnergy);
 
@@ -314,9 +348,14 @@ public class SimulationViewPresenter implements MapChangeListener {
             initializeMap();
         });
 
-        simulation = new Simulation(startPositions, directionSequences, map, plantEnergy, animalEnergy, minEnergy);
-        new Thread(simulation).start();
+        // Przypisz symulację do pola klasy (to kluczowe!)
+        simulation = new Simulation(startPositions, directionSequences, map,
+                plantEnergy, animalEnergy, minEnergy, numberOfPlants);
+        simulationThread = new Thread(simulation);
+        simulationThread.start();
+        System.out.println("Simulation initialized and thread started.");
     }
+
 
 
 
