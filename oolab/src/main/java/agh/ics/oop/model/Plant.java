@@ -6,10 +6,12 @@ import java.util.List;
 public class Plant implements WorldElement {
     private final Vector2d position;
     private final boolean isLarge;
+    private final int energy;
 
-    public Plant(Vector2d position, boolean isLarge) {
+    public Plant(Vector2d position, boolean isLarge,int energy) {
         this.position = position;
         this.isLarge = isLarge;
+        this.energy = isLarge ? energy+20 : energy;
     }
 
     public boolean isLarge() {
@@ -37,6 +39,10 @@ public class Plant implements WorldElement {
     @Override
     public String toString() {
         return isLarge ? "L" : "P"; // Duże drzewa oznaczane jako "L", zwykłe jako "P"
+    }
+
+    public int getEnergyValue() {
+        return energy;
     }
 }
 

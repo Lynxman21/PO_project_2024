@@ -8,7 +8,7 @@ public class EquatorialForest extends AbstractWorldMap {
 
     protected final int width;
     protected final int height;
-    protected final Map<Vector2d, Plant> plants = new HashMap<>();
+    protected Map<Vector2d, Plant> plants = new HashMap<>();
     protected final Random random = new Random();
     protected final Set<Vector2d> preferredFields = new HashSet<>();
     protected final Set<Vector2d> nonPreferredFields = new HashSet<>();
@@ -18,6 +18,10 @@ public class EquatorialForest extends AbstractWorldMap {
         this.width = width;
         this.height = height;
         initializeFields();
+    }
+
+    public void removePlant(Vector2d position) {
+        this.plants.remove(position);
     }
 
     private void initializeFields() {
@@ -36,6 +40,10 @@ public class EquatorialForest extends AbstractWorldMap {
         }
     }
 
+    public Map<Vector2d, Plant> getPlants() {
+        return plants; // Rośliny są przechowywane w Map<Vector2d, Plant>
+    }
+
     @Override
     public boolean canMoveTo(Vector2d position) {
         // Możemy się poruszyć, jeśli pozycja nie jest zajęta przez zwierzęta lub rośliny
@@ -44,18 +52,16 @@ public class EquatorialForest extends AbstractWorldMap {
 
     @Override
     public void growPlants() {
-        growPlants(0); // Domyślne wywołanie z `initialCount = 0` - potrzebne do generowanie drzew na starcie i potem losowo
+        growPlants(0,10); // Domyślne wywołanie z `initialCount = 0` - potrzebne do generowanie drzew na starcie i potem losowo
     }
 
-    public void growPlants(int initialCount) {
-        // Usuń rośliny zajęte przez zwierzęta
-        plants.entrySet().removeIf(entry -> animals.containsKey(entry.getKey()));
+    public void growPlants(int initialCount, int energy) {
+        plants.entrySet().removeIf(entry -> animals.containsKey(entry.getKey())); // Usuń zajęte rośliny
 
-        // Liczba nowych roślin do wygenerowania
         int plantsToGrow = initialCount > 0 ? initialCount : random.nextInt(10) + 1;
 
         for (int i = 0; i < plantsToGrow; i++) {
-            boolean preferPreferred = random.nextDouble() < 0.8; // 80% szans na preferowane pola
+            boolean preferPreferred = random.nextDouble() < 0.8; // Preferowane pola
             Set<Vector2d> targetFields = preferPreferred ? preferredFields : nonPreferredFields;
 
             // Filtruj dostępne pola
@@ -64,25 +70,29 @@ public class EquatorialForest extends AbstractWorldMap {
                     .toList();
 
             if (!availableFields.isEmpty()) {
-                // Wybierz losowe pole z dostępnych
-                Vector2d position = availableFields.get(random.nextInt(availableFields.size()));
-                boolean isLarge = preferPreferred && random.nextDouble() < 0.2; // 20% szans na dużą roślinę
+                Vector2d position = availableFields.get(random.nextInt(availableFields.size())); // Losowe pole
+                boolean isLarge = preferPreferred && random.nextDouble() < 0.2; // 20% szans na duże drzewo
 
                 if (isLarge) {
-                    List<Vector2d> area = new Plant(position, true).getArea();
-                    if (area.stream().allMatch(field -> !plants.containsKey(field))) {
-                        Plant largePlant = new Plant(position, true);
+                    List<Vector2d> area = new Plant(position, true, energy).getArea();
+                    if (area.stream().allMatch(field -> field.getX() < width && field.getY() < height)) {
+                        Plant largePlant = new Plant(position, true, energy);
                         for (Vector2d field : area) {
                             plants.put(field, largePlant);
                         }
                     }
                 } else {
-                    plants.put(position, new Plant(position, false));
+                    plants.put(position, new Plant(position, false, energy));
                 }
             }
         }
     }
 
+
+    @Override
+    public void move(Animal animal, MoveDirection direction) {
+
+    }
 
     @Override
     public boolean isOccupied(Vector2d position) {
@@ -91,7 +101,7 @@ public class EquatorialForest extends AbstractWorldMap {
 
     @Override
     public WorldElement objectAt(Vector2d position) {
-        if (animals.containsKey(position)) return animals.get(position);
+        if (animals.containsKey(position)) return animals.get(position).get(0);
         if (plants.containsKey(position)) return plants.get(position);
         return null;
     }

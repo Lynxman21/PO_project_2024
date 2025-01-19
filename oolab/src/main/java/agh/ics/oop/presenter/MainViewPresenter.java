@@ -25,6 +25,15 @@ public class MainViewPresenter {
     @FXML
     private Label infoLabel;
 
+    @FXML
+    private TextField plantEnergy;
+
+    @FXML
+    private TextField animalEnergy;
+
+    @FXML
+    private TextField minEnergy;
+
     public void onSimulationStartClicked(ActionEvent actionEvent) {
         try {
             // Pobierz parametry mapy i symulacji
@@ -32,6 +41,9 @@ public class MainViewPresenter {
             int mapHeight = Integer.parseInt(mapHeightField.getText().trim());
             int numberOfAnimals = Integer.parseInt(animalCountField.getText().trim());
             int numberOfPlants = Integer.parseInt(plantCountField.getText().trim());
+            int defaultPlantEnergy = Integer.parseInt(plantEnergy.getText().trim());
+            int deafultAnimalEnergy = Integer.parseInt(animalEnergy.getText().trim());
+            int minimumEnergy = Integer.parseInt(minEnergy.getText().trim());
 
             // Walidacja danych
             if (mapWidth <= 0 || mapHeight <= 0) {
@@ -46,6 +58,18 @@ public class MainViewPresenter {
                 infoLabel.setText("Error: Number of plants cannot be negative.");
                 return;
             }
+            if (defaultPlantEnergy <= 0) {
+                infoLabel.setText("Error: Plant energy must be greater than 0.");
+                return;
+            }
+            if (deafultAnimalEnergy < 0) {
+                infoLabel.setText("Error: Animal energy cannot be negative.");
+                return;
+            }
+            if (minimumEnergy < 0) {
+                infoLabel.setText("Error: Minimum energy cannot be negative.");
+                return;
+            }
 
             // Wczytanie widoku symulacji
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/SimulationView.fxml"));
@@ -55,7 +79,7 @@ public class MainViewPresenter {
 
             // Przekazanie danych do symulacji
             SimulationViewPresenter simulationPresenter = loader.getController();
-            simulationPresenter.initializeSimulation(mapWidth, mapHeight, numberOfAnimals, numberOfPlants);
+            simulationPresenter.initializeSimulation(mapWidth, mapHeight, numberOfAnimals, numberOfPlants,defaultPlantEnergy,deafultAnimalEnergy,minimumEnergy);
 
             // Otwórz okno symulacji
             simulationStage.show();
