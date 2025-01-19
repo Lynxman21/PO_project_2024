@@ -1,8 +1,8 @@
 package agh.ics.oop.model;
 
 public class Animal implements WorldElement {
-    private static final Vector2d LEFT_BOTTOM_CORNER = new Vector2d(0,0);
-    private static final Vector2d RIGHT_UP_CORNER = new Vector2d(4,4);
+    private static final Vector2d LEFT_BOTTOM_CORNER = new Vector2d(0, 0);
+    private static final Vector2d RIGHT_UP_CORNER = new Vector2d(4, 4);
 
     private MapDirection direction;
     private Vector2d position;
@@ -11,14 +11,16 @@ public class Animal implements WorldElement {
         this.direction = MapDirection.NORTH;
         this.position = position;
     }
+
     public Animal() {
-        this(new Vector2d(2,2));
+        this(new Vector2d(2, 2));
     }
 
     @Override
     public String toString() {
         return this.direction.toString();
     }
+
     public boolean isAt(Vector2d position) {
         return this.position.equals(position);
     }
@@ -34,8 +36,9 @@ public class Animal implements WorldElement {
     public void setPosition(Vector2d position) {
         this.position = position;
     }
+
     public void rotate(int count) {
-        for (int index=0;index<count;index++) {
+        for (int index = 0; index < count; index++) {
             direction = direction.next();
         }
     }
@@ -62,10 +65,4 @@ public class Animal implements WorldElement {
             this.position = newPosition; // Aktualizacja pozycji
         }
     }
-<<<<<<< Updated upstream
 }
-=======
-
-
-}
->>>>>>> Stashed changes

@@ -10,15 +10,12 @@ public class Simulation implements Runnable {
     private final List<Animal> animals;
     private final List<List<MoveDirection>> directionSequences; // Sekwencje ruchów dla każdego zwierzaka
     private final WorldMap map;
-<<<<<<< Updated upstream
-=======
     private final int plantEnergy;
     private final int animalEnergy;
     private final int minEnergy;
     private final Statistics stats;
     private volatile boolean running = true;
 
->>>>>>> Stashed changes
 
     public Simulation(List<Vector2d> startPositions, List<List<MoveDirection>> directionSequences, WorldMap map) {
         this.animals = new ArrayList<>();
@@ -70,16 +67,6 @@ public class Simulation implements Runnable {
     @Override
     public void run() {
         List<Thread> animalThreads = new ArrayList<>();
-<<<<<<< Updated upstream
-
-        for (int i = 0; i < animals.size(); i++) {
-            int animalIndex = i;
-            Thread animalThread = new Thread(() -> simulateAnimal(animalIndex));
-            animalThreads.add(animalThread);
-            animalThread.start();
-            System.out.println("Started thread for Animal " + animalIndex + " at position: " + animals.get(i).getPosition());
-        }
-=======
         while (running) { // Pętla działa, dopóki running == true
             for (int i = 0; i < animals.size(); i++) {
                 int animalIndex = i;
@@ -91,7 +78,6 @@ public class Simulation implements Runnable {
                     stats.incrementDay(); // Zwiększ dzień po zakończeniu tury
                 }
             }
->>>>>>> Stashed changes
 
             // Czekaj na zakończenie wątków zwierząt
             for (Thread thread : animalThreads) {
@@ -128,15 +114,6 @@ public class Simulation implements Runnable {
             MoveDirection direction = directions.get(step % directionCount); // Pobierz ruch w pętli
             map.move(animal, direction);
 
-<<<<<<< Updated upstream
-=======
-            if (animal.getEnergy() <= 0) {
-                map.removeAnimal(animal.getPosition(), animal);
-                directions.remove(animalIndex);
-                break; // Zwierzę umiera, kończymy pętlę
-            }
-
->>>>>>> Stashed changes
             System.out.println("Animal " + animalIndex + " moved: " + direction + " to position " + animal.getPosition());
 
             step++;
