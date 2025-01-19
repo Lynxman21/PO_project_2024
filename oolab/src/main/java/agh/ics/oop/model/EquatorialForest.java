@@ -14,7 +14,7 @@ public class EquatorialForest extends AbstractWorldMap {
     protected final Set<Vector2d> nonPreferredFields = new HashSet<>();
 
     public EquatorialForest(int width, int height) {
-        super(new HashMap<>());
+        super(new HashMap<>(), width, height);
         this.width = width;
         this.height = height;
         initializeFields();

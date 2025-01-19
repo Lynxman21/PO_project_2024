@@ -26,6 +26,8 @@ public interface WorldMap extends agh.ics.oop.model.MoveValidator {
      */
     void move(Animal animal, MoveDirection direction);
 
+    void move(Animal animal, int direction);
+
     /**
      * Return true if given position on the map is occupied. Should not be
      * confused with canMove since there might be empty positions where the animal

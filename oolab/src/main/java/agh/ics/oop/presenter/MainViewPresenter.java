@@ -71,20 +71,18 @@ public class MainViewPresenter {
                 return;
             }
 
-            // Wczytanie widoku symulacji
+            // Wczytaj nową scenę symulacji
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/SimulationView.fxml"));
             Stage simulationStage = new Stage();
             simulationStage.setScene(new Scene(loader.load()));
             simulationStage.setTitle("Simulation");
 
-            // Przekazanie danych do symulacji
+            // Pobierz kontroler i zainicjalizuj symulację
             SimulationViewPresenter simulationPresenter = loader.getController();
             simulationPresenter.initializeSimulation(mapWidth, mapHeight, numberOfAnimals, numberOfPlants,defaultPlantEnergy,deafultAnimalEnergy,minimumEnergy);
 
             // Otwórz okno symulacji
             simulationStage.show();
-        } catch (NumberFormatException e) {
-            infoLabel.setText("Error: Please enter valid numerical values.");
         } catch (Exception e) {
             e.printStackTrace();
             infoLabel.setText("Unexpected error occurred.");
