@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import static agh.ics.oop.OptionsParser.parse;
 
@@ -39,6 +40,22 @@ public class SimulationViewPresenter implements MapChangeListener {
 
     @FXML
     private GridPane mapGrid;
+
+    @FXML
+    private void initialize() {
+        Platform.runLater(() -> {
+            Stage stage = (Stage) mapGrid.getScene().getWindow();
+            stage.setOnCloseRequest(event -> {
+                if (simulation != null) {
+                    simulation.stop(); // Zatrzymaj symulację
+                    if (simulationThread != null && simulationThread.isAlive()) {
+                        simulationThread.interrupt(); // Przerwij wątek symulacji
+                    }
+                }
+            });
+        });
+    }
+
 
     private int widthCeil = 50;
     private int heightCeil = 50;
@@ -56,9 +73,9 @@ public class SimulationViewPresenter implements MapChangeListener {
     }
 
     private void clearGrid() {
-        mapGrid.getChildren().retainAll(mapGrid.getChildren().get(0)); // hack to retain visible grid lines
-        mapGrid.getColumnConstraints().clear();
-        mapGrid.getRowConstraints().clear();
+        mapGrid.getChildren().clear(); // Usuń wszystkie dzieci
+        mapGrid.getColumnConstraints().clear(); // Usuń wszystkie kolumny
+        mapGrid.getRowConstraints().clear(); // Usuń wszystkie wiersze
     }
 
     private void getCurrentParameters() {
@@ -149,23 +166,145 @@ public class SimulationViewPresenter implements MapChangeListener {
     public void mapChanged(WorldMap worldMap, String message) {
         Platform.runLater(() -> {
             infoLabel.setText(message); // Aktualizacja wiadomości w GUI
-            drawMap();                  // Odświeżenie mapy
+            updateDynamicElements();   // Aktualizuj tylko dynamiczne elementy
         });
     }
 
 
+<<<<<<< Updated upstream
     public void initializeSimulation(int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants) {
         PositionGenerator positionGenerator = new PositionGenerator(mapWidth, mapHeight);
+=======
+    private double cellSize; // Rozmiar komórki, obliczany dynamicznie
+>>>>>>> Stashed changes
 
-        // Generuj pozycje startowe dla zwierząt
-        List<Vector2d> animalPositions = positionGenerator.generateUniquePositions(numberOfAnimals);
+
+    public void initializeMap() {
+        clearGrid(); // Usuń istniejącą zawartość siatki
+
+        getCurrentParameters(); // Pobierz parametry mapy (wymiary, zakresy)
+
+        // Wyraźnie ustaw dokładnie `mapWidth` kolumn i `mapHeight` wierszy
+        for (int i = 0; i < mapWidth; i++) {
+            ColumnConstraints column = new ColumnConstraints();
+            column.setPrefWidth(800.0 / mapWidth); // Stała szerokość kolumny
+            column.setMinWidth(800.0 / mapWidth); // Minimalna szerokość
+            column.setMaxWidth(800.0 / mapWidth); // Maksymalna szerokość
+            mapGrid.getColumnConstraints().add(column);
+        }
+        for (int i = 0; i < mapHeight; i++) {
+            RowConstraints row = new RowConstraints();
+            row.setPrefHeight(800.0 / mapHeight); // Stała wysokość wiersza
+            row.setMinHeight(800.0 / mapHeight); // Minimalna wysokość
+            row.setMaxHeight(800.0 / mapHeight); // Maksymalna wysokość
+            mapGrid.getRowConstraints().add(row);
+        }
+
+        // Wypełnienie siatki żółtym tłem
+        for (int x = 0; x < mapWidth; x++) {
+            for (int y = 0; y < mapHeight; y++) {
+                Rectangle backgroundRectangle = new Rectangle(800.0 / mapWidth, 800.0 / mapHeight);
+                backgroundRectangle.setFill(javafx.scene.paint.Color.LIGHTYELLOW); // Tło żółte
+                mapGrid.add(backgroundRectangle, x, y);
+            }
+        }
+    }
+
+
+
+
+
+
+
+    private void scaleCells() {
+        double cellWidth = 800.0 / mapWidth;
+        double cellHeight = 800.0 / mapHeight;
+
+        // Ustaw rozmiary kolumn i wierszy
+        for (ColumnConstraints col : mapGrid.getColumnConstraints()) {
+            col.setPrefWidth(cellWidth);
+            col.setMinWidth(cellWidth);
+            col.setMaxWidth(cellWidth);
+        }
+        for (RowConstraints row : mapGrid.getRowConstraints()) {
+            row.setPrefHeight(cellHeight);
+            row.setMinHeight(cellHeight);
+            row.setMaxHeight(cellHeight);
+        }
+
+        // Debugowanie
+        System.out.println("Cell size: " + cellWidth + "x" + cellHeight);
+    }
+
+
+
+
+
+
+
+    public void updateDynamicElements() {
+        // Usuń dynamiczne elementy
+        mapGrid.getChildren().removeIf(node -> node instanceof Rectangle && !((Rectangle) node).getFill().equals(javafx.scene.paint.Color.LIGHTYELLOW));
+
+        // Dodaj rośliny
+        if (map instanceof EquatorialForest) {
+            Map<Vector2d, Plant> plants = ((EquatorialForest) map).getPlants();
+            for (Vector2d position : plants.keySet()) {
+                Plant plant = plants.get(position);
+                if (plant != null) {
+                    Rectangle plantRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2); // Margines 2px
+                    plantRectangle.setFill(plant.isLarge() ? javafx.scene.paint.Color.DARKGREEN : javafx.scene.paint.Color.LIGHTGREEN);
+                    mapGrid.add(plantRectangle, position.getX(), position.getY());
+                }
+            }
+        }
+
+        // Dodaj zwierzęta
+        if (map instanceof AbstractWorldMap) {
+            Map<Vector2d, List<Animal>> animals = ((AbstractWorldMap) map).getAnimals();
+            for (Vector2d position : animals.keySet()) {
+                List<Animal> animalsAtPosition = animals.get(position);
+                if (animalsAtPosition != null && !animalsAtPosition.isEmpty()) {
+                    Rectangle animalRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2); // Margines 2px
+                    animalRectangle.setFill(javafx.scene.paint.Color.BURLYWOOD); // Kolor zwierząt
+                    mapGrid.add(animalRectangle, position.getX(), position.getY());
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+    private Thread simulationThread;
+    private Simulation simulation;
+
+
+
+    public void initializeSimulation(int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants, int plantEnergy, int animalEnergy, int minEnergy) {
+        PositionGenerator positionGenerator = new PositionGenerator(mapWidth, mapHeight);
+        List<Vector2d> startPositions = new ArrayList<>();
+
+        // Generowanie unikalnych pozycji
+        for (int i = 0; i < numberOfAnimals; i++) {
+            Vector2d position;
+
+            // Pętla zapewniająca unikalność pozycji
+            do {
+                position = positionGenerator.generateUniquePositions(1).get(0);
+            } while (startPositions.contains(position)); // Sprawdzanie unikalności
+
+            startPositions.add(position);
+        }
 
         // Generowanie sekwencji ruchów
         List<List<MoveDirection>> directionSequences = SimulationInputGenerator.generateRandomMoveSequences(
                 numberOfAnimals, 5, 20
         );
-        System.out.println(directionSequences);
 
+<<<<<<< Updated upstream
         AbstractWorldMap map = new EarthMap(mapWidth, mapHeight);
 
         // Dodaj początkowe rośliny
@@ -176,10 +315,28 @@ public class SimulationViewPresenter implements MapChangeListener {
         map.addObserver(this);
 
         Simulation simulation = new Simulation(animalPositions, directionSequences, map);
+=======
+        AbstractWorldMap map = new EarthMap(mapWidth, mapHeight, minEnergy);
+
+        // Dodaj początkowe rośliny
+        if (map instanceof EquatorialForest) {
+            ((EquatorialForest) map).growPlants(numberOfPlants, plantEnergy);
+        }
+
+        map.addObserver(this);
+>>>>>>> Stashed changes
         this.setWorldMap(map);
 
+        // Wywołaj jednorazową inicjalizację mapy
+        Platform.runLater(() -> {
+            initializeMap();
+        });
+
+        simulation = new Simulation(startPositions, directionSequences, map, plantEnergy, animalEnergy, minEnergy);
         new Thread(simulation).start();
     }
+
+
 
 
 

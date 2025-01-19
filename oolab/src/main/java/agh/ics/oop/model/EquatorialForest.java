@@ -36,6 +36,10 @@ public class EquatorialForest extends AbstractWorldMap {
         }
     }
 
+    public Map<Vector2d, Plant> getPlants() {
+        return plants; // Rośliny są przechowywane w Map<Vector2d, Plant>
+    }
+
     @Override
     public boolean canMoveTo(Vector2d position) {
         // Możemy się poruszyć, jeśli pozycja nie jest zajęta przez zwierzęta lub rośliny
@@ -47,15 +51,19 @@ public class EquatorialForest extends AbstractWorldMap {
         growPlants(0); // Domyślne wywołanie z `initialCount = 0` - potrzebne do generowanie drzew na starcie i potem losowo
     }
 
+<<<<<<< Updated upstream
     public void growPlants(int initialCount) {
         // Usuń rośliny zajęte przez zwierzęta
         plants.entrySet().removeIf(entry -> animals.containsKey(entry.getKey()));
+=======
+    public void growPlants(int initialCount, int energy) {
+        plants.entrySet().removeIf(entry -> animals.containsKey(entry.getKey())); // Usuń zajęte rośliny
+>>>>>>> Stashed changes
 
-        // Liczba nowych roślin do wygenerowania
         int plantsToGrow = initialCount > 0 ? initialCount : random.nextInt(10) + 1;
 
         for (int i = 0; i < plantsToGrow; i++) {
-            boolean preferPreferred = random.nextDouble() < 0.8; // 80% szans na preferowane pola
+            boolean preferPreferred = random.nextDouble() < 0.8; // Preferowane pola
             Set<Vector2d> targetFields = preferPreferred ? preferredFields : nonPreferredFields;
 
             // Filtruj dostępne pola
@@ -64,25 +72,39 @@ public class EquatorialForest extends AbstractWorldMap {
                     .toList();
 
             if (!availableFields.isEmpty()) {
-                // Wybierz losowe pole z dostępnych
-                Vector2d position = availableFields.get(random.nextInt(availableFields.size()));
-                boolean isLarge = preferPreferred && random.nextDouble() < 0.2; // 20% szans na dużą roślinę
+                Vector2d position = availableFields.get(random.nextInt(availableFields.size())); // Losowe pole
+                boolean isLarge = preferPreferred && random.nextDouble() < 0.2; // 20% szans na duże drzewo
 
                 if (isLarge) {
+<<<<<<< Updated upstream
                     List<Vector2d> area = new Plant(position, true).getArea();
                     if (area.stream().allMatch(field -> !plants.containsKey(field))) {
                         Plant largePlant = new Plant(position, true);
+=======
+                    List<Vector2d> area = new Plant(position, true, energy).getArea();
+                    if (area.stream().allMatch(field -> field.getX() < width && field.getY() < height)) {
+                        Plant largePlant = new Plant(position, true, energy);
+>>>>>>> Stashed changes
                         for (Vector2d field : area) {
                             plants.put(field, largePlant);
                         }
                     }
                 } else {
+<<<<<<< Updated upstream
                     plants.put(position, new Plant(position, false));
+=======
+                    plants.put(position, new Plant(position, false, energy));
+>>>>>>> Stashed changes
                 }
             }
         }
     }
 
+
+    @Override
+    public void move(Animal animal, MoveDirection direction) {
+
+    }
 
     @Override
     public boolean isOccupied(Vector2d position) {

@@ -42,27 +42,30 @@ public class Animal implements WorldElement {
 
     //za pomocą tych funkcji co były np na lewo czy na prawo
     public void move(MoveDirection direction, MoveValidator validator) {
-        Vector2d newPosition;
+        Vector2d newPosition = this.position; // Domyślna nowa pozycja
+
         switch (direction) {
-            case MoveDirection.RIGHT:
-                this.direction = this.direction.next();
-                break;
-            case MoveDirection.LEFT:
-                this.direction = this.direction.previous();
-                break;
-            case MoveDirection.FORWARD:
-                newPosition = this.position.add(this.direction.toUnitVector());
-                if (validator.canMoveTo(newPosition)) {
-                    this.position = newPosition;
-                }
-                break;
-            case MoveDirection.BACKWARD:
-                Vector2d newDirectionVect = this.direction.toUnitVector().opposite();
-                newPosition = this.position.add(newDirectionVect);
-                if (validator.canMoveTo(newPosition)) {
-                    this.position = newPosition;
-                }
-                break;
+            case RIGHT -> this.direction = this.direction.next(); // Obrót w prawo
+            case LEFT -> this.direction = this.direction.previous(); // Obrót w lewo
+            case FORWARD -> {
+                Vector2d forwardVector = this.direction.toUnitVector();
+                newPosition = this.position.add(forwardVector);
+            }
+            case BACKWARD -> {
+                Vector2d backwardVector = this.direction.toUnitVector().opposite();
+                newPosition = this.position.add(backwardVector);
+            }
+        }
+
+        // Sprawdź, czy nowa pozycja jest dozwolona przez mapę
+        if (validator.canMoveTo(newPosition)) {
+            this.position = newPosition; // Aktualizacja pozycji
         }
     }
+<<<<<<< Updated upstream
 }
+=======
+
+
+}
+>>>>>>> Stashed changes

@@ -45,6 +45,13 @@ public abstract class AbstractWorldMap implements WorldMap{
         }
     }
 
+
+
+    public Map<Vector2d, List<Animal>> getAnimals() {
+        return animals; // Zwierzęta są przechowywane w Map<Vector2d, List<Animal>>
+    }
+
+
     @Override
     public void place(Animal animal) throws IncorrectPositionException{
         Vector2d vect = animal.getPosition();
