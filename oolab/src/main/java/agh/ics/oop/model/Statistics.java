@@ -11,28 +11,28 @@ import java.util.Map;
 public class Statistics {
 
     @FXML
-    private Label dayDisplay;
+    public Label dayDisplay;
 
     @FXML
-    private Label animalCountDisplay;
+    public Label animalCountDisplay;
 
     @FXML
-    private Label plantDisplay;
+    public Label plantDisplay;
 
     @FXML
-    private Label emptyCellsDisplay;
+    public Label emptyCellsDisplay;
 
     @FXML
-    private Label mostCommonGenomDisplay;
+    public Label mostCommonGenomDisplay;
 
     @FXML
-    private Label averageEnergyDisplay;
+    public Label averageEnergyDisplay;
 
     @FXML
-    private Label averageLifeDisplay;
+    public Label averageLifeDisplay;
 
     @FXML
-    private Label averageChildrenCountDisplay;
+    public Label averageChildrenCountDisplay;
 
     private int day;
     private int animalCount;
@@ -131,4 +131,20 @@ public class Statistics {
     public void newMostCommonGenom(List<Animal> animals) {
         this.mostCommonGenom = calculateMostCommonGenom(animals);
     }
+
+    public void displayStats() {
+        System.out.println("dayDisplay: " + dayDisplay); // Sprawdzenie, czy pole jest null
+        System.out.println("Day: " + day);
+
+        if (dayDisplay != null) dayDisplay.setText(String.valueOf(day));
+        if (animalCountDisplay != null) animalCountDisplay.setText(String.valueOf(animalCount));
+        if (plantDisplay != null) plantDisplay.setText(String.valueOf(plantCount));
+        if (emptyCellsDisplay != null) emptyCellsDisplay.setText(String.valueOf(emptyCells));
+        if (mostCommonGenomDisplay != null) mostCommonGenomDisplay.setText(mostCommonGenom != null ? mostCommonGenom.toString() : "None");
+        if (averageEnergyDisplay != null) averageEnergyDisplay.setText(String.valueOf(averageEnergy));
+        if (averageLifeDisplay != null) averageLifeDisplay.setText(String.valueOf(averageLifeLen));
+        if (averageChildrenCountDisplay != null) averageChildrenCountDisplay.setText(String.valueOf(averageCountOfChildren));
+    }
+
+
 }

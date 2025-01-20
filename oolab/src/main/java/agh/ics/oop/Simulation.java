@@ -17,18 +17,20 @@ public class Simulation implements Runnable {
     private final int plantEnergy;
     private final int animalEnergy;
     private final int minEnergy;
-    private final Statistics stats;
+    private final Statistics statistics;
     private volatile boolean running = true;
     private final int dailyPlantCount;
 
-    public Simulation(List<Vector2d> startPositions, List<List<Integer>> directionSequences, WorldMap map, int plantEnergy, int animalEnergy, int minEnergy, int columns, int rows, int dailyPlantCount) {
+    public Simulation(List<Vector2d> startPositions, List<List<Integer>> directionSequences, WorldMap map,
+                      int plantEnergy, int animalEnergy, int minEnergy, int columns, int rows,
+                      int dailyPlantCount, Statistics statistics) {
         this.animals = new ArrayList<>();
         this.directionSequences = directionSequences;
         this.map = map;
-        this.plantEnergy=plantEnergy;
-        this.animalEnergy=animalEnergy;
-        this.minEnergy=minEnergy;
-        this.stats = new Statistics(map,animals,animals.size(),dailyPlantCount,columns,rows,minEnergy);
+        this.plantEnergy = plantEnergy;
+        this.animalEnergy = animalEnergy;
+        this.minEnergy = minEnergy;
+        this.statistics = statistics; // Zapisanie referencji do obiektu statystyk
         this.dailyPlantCount = dailyPlantCount;
 
         if (startPositions.size() != directionSequences.size()) {
@@ -75,15 +77,14 @@ public class Simulation implements Runnable {
                         continue;
                     }
 
-                    int step = stats.getDay() % directions.size();
-                    int direction = directions.get(step);
+                    int step = statistics.getDay() % directionSequences.get(i).size();
+                    map.move(animal, directionSequences.get(i).get(step));
 
-                    map.move(animal, direction);
 
                     if (animal.getEnergy() <= 0) {
                         System.out.println("Animal died at position: " + animal.getPosition());
                         map.removeAnimal(animal.getPosition(), animal);
-                        stats.newAverageLifeLen(animal);
+                        statistics.newAverageLifeLen(animal);
                     } else {
                         animal.incrementLifeLen();
                     }
@@ -98,15 +99,11 @@ public class Simulation implements Runnable {
                 ((EquatorialForest) map).growPlants(dailyPlantCount, plantEnergy);
             }
 
-            stats.newEmptyCells();
-            stats.newAverageEnergy(animals);
-            stats.incrementDay();
+            statistics.newEmptyCells();
+            statistics.newAverageEnergy(animals);
+            statistics.incrementDay();
 
-//            Platform.runLater(() -> {
-//                presenter.updateStats(stats);
-//            });
-
-            System.out.println("Day " + stats.getDay() + " ended.");
+            Platform.runLater(statistics::displayStats); // Wywołanie metody w wątku GUI
 
             if (animals.stream().allMatch(a -> a.getEnergy() <= 0)) {
                 System.out.println("All animals are dead. Stopping simulation.");
@@ -114,7 +111,7 @@ public class Simulation implements Runnable {
             }
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 System.out.println("Simulation interrupted.");
                 Thread.currentThread().interrupt();
@@ -146,7 +143,7 @@ public class Simulation implements Runnable {
         if (parent1.getEnergy() >= minEnergy && parent2.getEnergy() >= minEnergy) {
             if (map instanceof EarthMap) {
                 EarthMap earthMap = (EarthMap) map;
-                Animal child = earthMap.reproduce(parent1, parent2, stats);
+                Animal child = earthMap.reproduce(parent1, parent2, statistics);
                 try {
                     map.place(child); // Dodaj dziecko do mapy
 
