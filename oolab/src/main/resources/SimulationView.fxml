@@ -3,21 +3,119 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
-
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.geometry.Insets?>
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            minHeight="750.0" minWidth="850.0"
-            fx:controller="agh.ics.oop.presenter.SimulationViewPresenter">
+<?import javafx.scene.text.Font?>
+
+<BorderPane minHeight="750.0" minWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.presenter.SimulationViewPresenter">
     <top>
-        <Label fx:id="infoLabel" text="Simulation running..." textAlignment="CENTER"/>
+        <Label fx:id="infoLabel" text="Simulation running..." textAlignment="CENTER" />
     </top>
     <center>
         <VBox>
-            <GridPane fx:id="mapGrid" gridLinesVisible="true" prefWidth="800" prefHeight="800" />
+            <GridPane fx:id="mapGrid" gridLinesVisible="true" prefHeight="800" prefWidth="800" />
 
 
         </VBox>
     </center>
+    <right>
+        <VBox prefHeight="800.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+            <HBox prefHeight="38.0" prefWidth="240.0">
+                <Label prefHeight="27.0" prefWidth="66.0" text="Dzień:">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <Label fx:id="dayDisplay" prefHeight="28.0" prefWidth="41.0">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="171.0">
+                <Label text="Liczba zwierząt:">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <Label fx:id="animalCountDisplay" prefHeight="26.0" prefWidth="47.0">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <HBox prefHeight="42.0" prefWidth="171.0">
+                <Label prefHeight="27.0" prefWidth="107.0" text="Liczba roślin:">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <Label fx:id="plantDisplay">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <HBox layoutX="10.0" layoutY="118.0" prefHeight="42.0" prefWidth="171.0">
+                <Label text="Liczba wolnych pól:">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <Label fx:id="emptyCellsDisplay">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <HBox prefHeight="44.0" prefWidth="171.0">
+                <Label text="Najpopularniejszy genotyp:">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <Label fx:id="mostCommonGenomDisplay">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <HBox layoutX="10.0" layoutY="218.0" prefHeight="44.0" prefWidth="171.0">
+                <Label text="Średni poziom energii:">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <Label fx:id="averageEnergyDisplay">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <HBox prefHeight="48.0" prefWidth="236.0">
+                <Label text="Średnia długość życie:">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <Label fx:id="averageLifeDisplay">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+            </HBox>
+            <HBox prefHeight="51.0" prefWidth="251.0">
+                <Label text="Średnia liczba dzieci">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+                <Label fx:id="averageChildrenCountDisplay">
+                    <font>
+                        <Font size="17.0" />
+                    </font>
+                </Label>
+            </HBox>
+        </VBox>
+    </right>
 </BorderPane>

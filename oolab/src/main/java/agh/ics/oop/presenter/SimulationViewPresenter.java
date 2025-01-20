@@ -1,33 +1,23 @@
 package agh.ics.oop.presenter;
 
-import agh.ics.oop.OptionsParser;
 import agh.ics.oop.Simulation;
-import agh.ics.oop.SimulationEngine;
 import agh.ics.oop.model.*;
 import agh.ics.oop.model.util.Boundary;
 import agh.ics.oop.model.util.PositionGenerator;
 import agh.ics.oop.model.util.SimulationInputGenerator;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import static agh.ics.oop.OptionsParser.parse;
 
 public class SimulationViewPresenter implements MapChangeListener {
     private WorldMap map;
@@ -36,13 +26,51 @@ public class SimulationViewPresenter implements MapChangeListener {
     private Label infoLabel;
 
     @FXML
+    private Label dayDisplay;
+
+    @FXML
+    private Label animalCountDisplay;
+
+    @FXML
+    private Label plantDisplay;
+
+    @FXML
+    private Label emptyCellsDisplay;
+
+    @FXML
+    private Label mostCommonGenomDisplay;
+
+    @FXML
+    private Label averageEnergyDisplay;
+
+    @FXML
+    private Label averageLifeDisplay;
+
+    @FXML
+    private Label averageChildrenCountDisplay;
+
+    @FXML
     private TextField moveList;
 
     @FXML
     private GridPane mapGrid;
 
+
+    private int widthCeil = 50;
+    private int heightCeil = 50;
+    private int mapWidth;
+    private int mapHeight;
+    private Boundary boundary;
+    private int xMin;
+    private int xMax;
+    private int yMin;
+    private int yMax;
+    private Simulation simulation;
+    private Thread simulationThread;
+
     @FXML
     private void initialize() {
+        // Ensure the simulation stops correctly on window close
         Platform.runLater(() -> {
             Stage stage = (Stage) mapGrid.getScene().getWindow();
             stage.setOnCloseRequest(event -> {
@@ -60,26 +88,6 @@ public class SimulationViewPresenter implements MapChangeListener {
             });
         });
     }
-
-
-
-
-
-
-
-
-
-
-    private int widthCeil = 50;
-    private int heightCeil = 50;
-
-    private int mapWidth;
-    private int mapHeight;
-    private Boundary boundary;
-    private int xMin;
-    private int xMax;
-    private int yMin;
-    private int yMax;
 
     public void setWorldMap(WorldMap map) {
         this.map = map;
@@ -116,65 +124,6 @@ public class SimulationViewPresenter implements MapChangeListener {
         }
     }
 
-    private void addElements() {
-        for (int w = xMin; w <= xMax; w++) {
-            for (int h = yMin; h <= yMax; h++) {
-                Vector2d position = new Vector2d(w, h);
-                if (map.isOccupied(position)) {
-                    WorldElement element = map.objectAt(position);
-                    if (element != null) {
-                        Label label = new Label(element.toString());
-                        mapGrid.add(label, w - xMin + 1, yMax - h + 1);
-                        GridPane.setHalignment(label, HPos.CENTER);
-                    }
-                }
-            }
-        }
-    }
-
-
-    public void drawMap() {
-        clearGrid(); // Usuń poprzednią zawartość siatki
-
-        getCurrentParameters(); // Pobierz aktualne parametry mapy
-
-        mapGrid.getColumnConstraints().add(new ColumnConstraints(widthCeil));
-        mapGrid.getRowConstraints().add(new RowConstraints(heightCeil));
-        Label label = new Label("y/x");
-        mapGrid.add(label, 0, 0);
-        GridPane.setHalignment(label, HPos.CENTER);
-
-        addCollumnsAndRows();
-
-        // Rysowanie zawartości mapy
-        for (int x = xMin; x <= xMax; x++) {
-            for (int y = yMin; y <= yMax; y++) {
-                Vector2d position = new Vector2d(x, y);
-                Rectangle rectangle = new Rectangle(widthCeil - 2, heightCeil - 2); // Prostokąt z marginesem
-
-                // Ustaw kolor w zależności od zawartości pola
-                if (map.isOccupied(position)) {
-                    Object object = map.objectAt(position);
-                    if (object instanceof Plant plant) {
-                        if (plant.isLarge()) {
-                            rectangle.setFill(javafx.scene.paint.Color.DARKGREEN); // Duże drzewo
-                        } else {
-                            rectangle.setFill(javafx.scene.paint.Color.LIGHTGREEN); // Zwykłe drzewo
-                        }
-                    } else if (object instanceof Animal) {
-                        rectangle.setFill(javafx.scene.paint.Color.BURLYWOOD); // Zwierzę
-                    }
-                } else {
-                    rectangle.setFill(javafx.scene.paint.Color.BEIGE); // Puste pole
-                }
-
-                // Dodanie prostokąta do siatki
-                mapGrid.add(rectangle, x - xMin + 1, yMax - y + 1); // Pozycja w siatce
-            }
-        }
-    }
-
-
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
         Platform.runLater(() -> {
@@ -182,10 +131,6 @@ public class SimulationViewPresenter implements MapChangeListener {
             updateDynamicElements();   // Aktualizuj tylko dynamiczne elementy
         });
     }
-
-
-    private double cellSize; // Rozmiar komórki, obliczany dynamicznie
-
 
     public void initializeMap() {
         clearGrid(); // Usuń istniejącą zawartość siatki
@@ -217,38 +162,6 @@ public class SimulationViewPresenter implements MapChangeListener {
             }
         }
     }
-
-
-
-
-
-
-
-    private void scaleCells() {
-        double cellWidth = 800.0 / mapWidth;
-        double cellHeight = 800.0 / mapHeight;
-
-        // Ustaw rozmiary kolumn i wierszy
-        for (ColumnConstraints col : mapGrid.getColumnConstraints()) {
-            col.setPrefWidth(cellWidth);
-            col.setMinWidth(cellWidth);
-            col.setMaxWidth(cellWidth);
-        }
-        for (RowConstraints row : mapGrid.getRowConstraints()) {
-            row.setPrefHeight(cellHeight);
-            row.setMinHeight(cellHeight);
-            row.setMaxHeight(cellHeight);
-        }
-
-        // Debugowanie
-        System.out.println("Cell size: " + cellWidth + "x" + cellHeight);
-    }
-
-
-
-
-
-
 
     public void updateDynamicElements() {
         // Usuń dynamiczne elementy
@@ -301,17 +214,6 @@ public class SimulationViewPresenter implements MapChangeListener {
         }
     }
 
-
-
-
-
-
-
-
-    // Dodaj pole w klasie SimulationViewPresenter
-    private Simulation simulation;
-    private Thread simulationThread;
-
     public void initializeSimulation(int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants, int plantEnergy, int animalEnergy, int minEnergy) {
         PositionGenerator positionGenerator = new PositionGenerator(mapWidth, mapHeight);
         List<Vector2d> startPositions = new ArrayList<>();
@@ -354,20 +256,9 @@ public class SimulationViewPresenter implements MapChangeListener {
         });
 
         // Przypisz symulację do pola klasy (to kluczowe!)
-        simulation = new Simulation(startPositions, directionSequences, map,
-                plantEnergy, animalEnergy, minEnergy, numberOfPlants);
+        simulation = new Simulation(startPositions, directionSequences, map, plantEnergy, animalEnergy, minEnergy, mapWidth, mapHeight, numberOfPlants);
         simulationThread = new Thread(simulation);
         simulationThread.start();
         System.out.println("Simulation initialized and thread started.");
     }
-
-
-
-
-
-
-
-
-
-
 }

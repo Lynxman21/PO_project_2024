@@ -1,24 +1,57 @@
 package agh.ics.oop.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Animal implements WorldElement {
-    private static final Vector2d LEFT_BOTTOM_CORNER = new Vector2d(0,0);
-    private static final Vector2d RIGHT_UP_CORNER = new Vector2d(4,4);
 
     private MapDirection direction;
     private Vector2d position;
     private int energy;
     private List<MoveDirection> moves;
-
+    private int age = 0; // Wiek zwierzęcia
+//    private int childrenCount = 0; // Liczba dzieci
+    private int lifeLen;
+    private int childrenCount;
 
     public Animal(Vector2d position,int energy) {
         this.direction = MapDirection.NORTH;
         this.position = position;
         this.energy = energy;
         this.moves = generateDefaultMoves(); // Dodaj tę linię
+        this.lifeLen = 0;
+        this.childrenCount = 0;
+    }
+
+    public void incrementLifeLen() {
+        lifeLen++;
+    }
+
+    public void incrementChildrenCount() {
+        childrenCount++;
+    }
+
+    public MoveDirection getMostCommonGenom() {
+        // Mapa do zliczania wystąpień każdego kierunku
+        Map<MoveDirection, Integer> frequencyMap = new HashMap<>();
+
+        for (MoveDirection move : moves) {
+            frequencyMap.put(move, frequencyMap.getOrDefault(move, 0) + 1);
+        }
+
+        // Znajdź kierunek z największą liczbą wystąpień
+        return frequencyMap.entrySet().stream()
+                .max(Comparator.comparingInt(Map.Entry::getValue))
+                .map(Map.Entry::getKey)
+                .orElse(null); // Zwróć null, jeśli lista jest pusta
+    }
+
+
+    public int getLifeLen() {
+        return lifeLen;
+    }
+
+    public int getChildrenCount() {
+        return childrenCount;
     }
 
     public void setMoves(List<MoveDirection> moves) {
@@ -52,8 +85,6 @@ public class Animal implements WorldElement {
 
         return moves;
     }
-
-
 
     public Animal() {
         this(new Vector2d(2,2),10);
@@ -120,29 +151,12 @@ public class Animal implements WorldElement {
         System.out.println("Animal moved to " + this.position + ", remaining energy: " + this.energy);
     }
 
-
-
-
-
-
-    private int age = 0; // Wiek zwierzęcia
-    private int childrenCount = 0; // Liczba dzieci
-
-    public int getAge() {
-        return age;
-    }
-
-    public void incrementAge() {
-        age++;
-    }
-
-    public int getChildrenCount() {
-        return childrenCount;
-    }
-
-    public void incrementChildrenCount() {
-        childrenCount++;
-    }
-
+//    public int getAge() {
+//        return age;
+//    }
+//
+//    public void incrementAge() {
+//        age++;
+//    }
 
 }

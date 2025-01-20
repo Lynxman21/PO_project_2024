@@ -16,12 +16,6 @@ public class EcosystemManager {
         this.plantList = map.getPlants();
     }
 
-//    public void isAnimalAlive(Animal animal) {
-//        if (animal.getEnergy() == 0) {
-//            map.removeAnimal(animal.getPosition());
-//        }
-//    }
-
     public void plantConsume(Animal animal, Plant plant) {
         Vector2d position = animal.getPosition();
         animal.incrementEnergy(plantList.get(position).getEnergyValue());
@@ -33,6 +27,5 @@ public class EcosystemManager {
         } else {
             map.removePlant(position);
         }
-
     }
 }

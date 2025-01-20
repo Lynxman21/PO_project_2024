@@ -49,22 +49,15 @@ public abstract class AbstractWorldMap implements WorldMap{
         observers.add(observer);
     }
 
-    public void removeObserver(MapChangeListener observer) {
-        observers.remove(observer);
-    }
-
     protected void informObservers(String message) {
         for (MapChangeListener observer : observers) {
             observer.mapChanged(this,message);
         }
     }
 
-
-
     public Map<Vector2d, List<Animal>> getAnimals() {
         return animals; // Zwierzęta są przechowywane w Map<Vector2d, List<Animal>>
     }
-
 
     @Override
     public synchronized void place(Animal animal) throws IncorrectPositionException {
@@ -74,13 +67,9 @@ public abstract class AbstractWorldMap implements WorldMap{
         informObservers("Animal placed at: " + position);
     }
 
-
-
-
     public Map<Vector2d, Plant> getPlants() {
         throw new UnsupportedOperationException("Plants are not supported on this map type.");
     }
-
 
     @Override
     public synchronized void move(Animal animal, int direction) {
@@ -126,18 +115,10 @@ public abstract class AbstractWorldMap implements WorldMap{
         }
     }
 
-
-
-
-
-
     @Override
     public boolean canMoveTo(Vector2d position) {
         return true; // Pozwala na wchodzenie wielu zwierząt na to samo pole
     }
-
-
-
 
     @Override
     public boolean isOccupied(Vector2d position) {

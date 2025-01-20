@@ -27,8 +27,6 @@ public class PositionGenerator {
                 positions.add(position);
             }
         }
-
         return new ArrayList<>(positions);
-
     }
 }
