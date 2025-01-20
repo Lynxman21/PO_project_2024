@@ -5,8 +5,6 @@ import agh.ics.oop.model.*;
 
 public class SimulationInputGenerator {
 
-    private static final Random random = new Random();
-
     public static List<List<Integer>> generateRandomMoveSequences(int numberOfAnimals, int minLength, int maxLength) {
         List<List<Integer>> sequences = new ArrayList<>();
 
@@ -23,13 +21,6 @@ public class SimulationInputGenerator {
             }
             sequences.add(sequence);
         }
-
         return sequences;
     }
-
-
-//    private static MoveDirection randomMoveDirection() {
-//        MoveDirection[] directions = MoveDirection.values();
-//        return directions[random.nextInt(directions.length)];
-//    }
 }

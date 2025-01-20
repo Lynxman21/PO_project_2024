@@ -18,7 +18,6 @@ public class EarthMap extends EquatorialForest {
         manager = new EcosystemManager(this);
     }
 
-
     public Map<Vector2d, Plant> getPlants() {
         return plants;
     }
@@ -95,26 +94,15 @@ public class EarthMap extends EquatorialForest {
         informObservers("Animal moved to: " + newPosition);
     }
 
-
-
-
-
     @Override
     public boolean canMoveTo(Vector2d position) {
         return true; // Możliwość wejścia na dowolne pole
     }
 
-
-
-
-
-
-
     @Override
     public boolean isOccupied(Vector2d position) {
         return animals.containsKey(position) || plants.containsKey(position); // Sprawdza zajętość przez zwierzęta i rośliny
     }
-
 
     private List<MoveDirection> createChildGenotype(Animal parent1, Animal parent2, double ratioParent1) {
         List<MoveDirection> moves1 = parent1.getMoves();
@@ -145,11 +133,6 @@ public class EarthMap extends EquatorialForest {
         return childGenotype;
     }
 
-
-
-
-
-
     private void mutateGenotype(List<MoveDirection> genotype) {
         if (genotype.isEmpty()) {
             System.err.println("Error: Genotype is empty. No mutations applied.");
@@ -165,13 +148,7 @@ public class EarthMap extends EquatorialForest {
         }
     }
 
-
-
-
-
-
-
-    public Animal reproduce(Animal parent1, Animal parent2) {
+    public Animal reproduce(Animal parent1, Animal parent2, Statistics statistics) {
         int totalEnergy = parent1.getEnergy() + parent2.getEnergy();
         double ratioParent1 = (double) parent1.getEnergy() / totalEnergy;
 
@@ -191,11 +168,8 @@ public class EarthMap extends EquatorialForest {
         // Rodzice zwiększają licznik dzieci
         parent1.incrementChildrenCount();
         parent2.incrementChildrenCount();
-
+        statistics.newAverageChildrenCount(parent1);
+        statistics.newAverageChildrenCount(parent2);
         return child;
     }
-
-
-
-
 }

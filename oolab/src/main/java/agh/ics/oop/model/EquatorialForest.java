@@ -88,10 +88,8 @@ public class EquatorialForest extends AbstractWorldMap {
         }
     }
 
-
     @Override
     public void move(Animal animal, MoveDirection direction) {
-
     }
 
     @Override
