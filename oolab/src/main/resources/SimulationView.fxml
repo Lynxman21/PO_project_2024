@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="750.0" minWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.presenter.SimulationViewPresenter">
+<BorderPane minHeight="750.0" minWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.presenter.SimulationViewPresenter" >
     <top>
         <Label fx:id="infoLabel" text="Simulation running..." textAlignment="CENTER" />
     </top>
@@ -19,7 +19,7 @@
         </VBox>
     </center>
     <right>
-        <VBox prefHeight="800.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+        <VBox prefHeight="800.0" prefWidth="500.0" BorderPane.alignment="CENTER" >
             <HBox prefHeight="38.0" prefWidth="240.0">
                 <Label prefHeight="27.0" prefWidth="66.0" text="Dzień:">
                     <font>

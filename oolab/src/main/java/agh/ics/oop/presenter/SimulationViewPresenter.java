@@ -67,10 +67,12 @@ public class SimulationViewPresenter implements MapChangeListener {
     private int yMax;
     private Simulation simulation;
     private Thread simulationThread;
+    private Statistics statistics;
+    private int minEnergy;
+
 
     @FXML
     private void initialize() {
-        // Ensure the simulation stops correctly on window close
         Platform.runLater(() -> {
             Stage stage = (Stage) mapGrid.getScene().getWindow();
             stage.setOnCloseRequest(event -> {
@@ -87,7 +89,24 @@ public class SimulationViewPresenter implements MapChangeListener {
                 }
             });
         });
+
+        if (statistics != null) {
+            bindStatistics(statistics); // Powiąż statystyki z elementami GUI
+        }
     }
+
+
+    public void bindStatistics(Statistics statistics) {
+        statistics.dayDisplay = dayDisplay;
+        statistics.animalCountDisplay = animalCountDisplay;
+        statistics.plantDisplay = plantDisplay;
+        statistics.emptyCellsDisplay = emptyCellsDisplay;
+        statistics.mostCommonGenomDisplay = mostCommonGenomDisplay;
+        statistics.averageEnergyDisplay = averageEnergyDisplay;
+        statistics.averageLifeDisplay = averageLifeDisplay;
+        statistics.averageChildrenCountDisplay = averageChildrenCountDisplay;
+    }
+
 
     public void setWorldMap(WorldMap map) {
         this.map = map;
@@ -250,13 +269,16 @@ public class SimulationViewPresenter implements MapChangeListener {
         map.addObserver(this);
         this.setWorldMap(map);
 
+        this.statistics = new Statistics(map, new ArrayList<>(), 0, 0, mapWidth, mapHeight, minEnergy);
+        bindStatistics(statistics); // Powiąż statystyki z elementami GUI
+
         // Wywołaj jednorazową inicjalizację mapy
         Platform.runLater(() -> {
             initializeMap();
         });
 
         // Przypisz symulację do pola klasy (to kluczowe!)
-        simulation = new Simulation(startPositions, directionSequences, map, plantEnergy, animalEnergy, minEnergy, mapWidth, mapHeight, numberOfPlants);
+        simulation = new Simulation(startPositions, directionSequences, map, plantEnergy, animalEnergy, minEnergy, mapWidth, mapHeight, numberOfPlants, statistics);
         simulationThread = new Thread(simulation);
         simulationThread.start();
         System.out.println("Simulation initialized and thread started.");
