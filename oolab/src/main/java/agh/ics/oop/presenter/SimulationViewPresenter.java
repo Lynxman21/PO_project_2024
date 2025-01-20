@@ -192,7 +192,7 @@ public class SimulationViewPresenter implements MapChangeListener {
 
         getCurrentParameters(); // Pobierz parametry mapy (wymiary, zakresy)
 
-        // Wyraźnie ustaw dokładnie `mapWidth` kolumn i `mapHeight` wierszy
+        // Wyraźnie ustaw dokładnie mapWidth kolumn i mapHeight wierszy
         for (int i = 0; i < mapWidth; i++) {
             ColumnConstraints column = new ColumnConstraints();
             column.setPrefWidth(800.0 / mapWidth); // Stała szerokość kolumny
@@ -257,7 +257,9 @@ public class SimulationViewPresenter implements MapChangeListener {
         // Dodaj rośliny
         if (map instanceof EquatorialForest) {
             Map<Vector2d, Plant> plants = ((EquatorialForest) map).getPlants();
-            for (Vector2d position : plants.keySet()) {
+            // Iteracja po kopii kluczy
+            List<Vector2d> plantPositions = new ArrayList<>(plants.keySet());
+            for (Vector2d position : plantPositions) {
                 Plant plant = plants.get(position);
                 if (plant != null) {
                     Rectangle plantRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2); // Margines 2px
@@ -278,7 +280,9 @@ public class SimulationViewPresenter implements MapChangeListener {
         // Dodaj zwierzęta
         if (map instanceof AbstractWorldMap) {
             Map<Vector2d, List<Animal>> animals = ((AbstractWorldMap) map).getAnimals();
-            for (Vector2d position : animals.keySet()) {
+            // Iteracja po kopii kluczy
+            List<Vector2d> animalPositions = new ArrayList<>(animals.keySet());
+            for (Vector2d position : animalPositions) {
                 List<Animal> animalsAtPosition = animals.get(position);
                 if (animalsAtPosition != null && !animalsAtPosition.isEmpty()) {
                     Rectangle animalRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2); // Margines 2px
@@ -296,6 +300,7 @@ public class SimulationViewPresenter implements MapChangeListener {
             }
         }
     }
+
 
 
 

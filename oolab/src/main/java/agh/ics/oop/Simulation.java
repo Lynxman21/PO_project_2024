@@ -2,8 +2,10 @@ package agh.ics.oop;
 
 import agh.ics.oop.model.exceptions.IncorrectPositionException;
 import agh.ics.oop.model.*;
+import agh.ics.oop.model.util.SimulationInputGenerator;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Simulation implements Runnable {
@@ -79,21 +81,20 @@ public class Simulation implements Runnable {
             for (int i = 0; i < animals.size(); i++) {
                 Animal animal = animals.get(i);
 
-                // Symuluj ruch zwierzęcia, jeśli nadal ma energię
                 if (animal.getEnergy() > 0) {
                     List<Integer> directions = directionSequences.get(i);
 
-                    // Sprawdzenie, czy lista kierunków nie jest pusta (chociaż nie powinna w tym rozwiązaniu)
+                    // Sprawdzenie, czy lista kierunków nie jest pusta
                     if (directions.isEmpty()) {
                         System.err.println("Error: Direction sequence is unexpectedly empty for animal at index " + i);
-                        continue; // Pomijamy zwierzę z pustą sekwencją
+                        continue;
                     }
 
                     // Pobranie kierunku z zapętloną sekwencją
-                    int step = stats.getDay() % directions.size(); // Moduł liczby dni przez rozmiar listy
+                    int step = stats.getDay() % directions.size();
                     int direction = directions.get(step);
 
-                    map.move(animal, direction); // Wykonaj ruch zwierzęcia
+                    map.move(animal, direction);
 
                     // Sprawdź, czy zwierzę umarło po ruchu
                     if (animal.getEnergy() <= 0) {
@@ -101,6 +102,12 @@ public class Simulation implements Runnable {
                         map.removeAnimal(animal.getPosition(), animal);
                     }
                 }
+            }
+
+
+            // Rozmnażanie zwierząt na każdym polu
+            for (Vector2d position : map.getAnimals().keySet()) {
+                reproduceAnimalsAt(position);
             }
 
             // Generowanie nowych roślin
@@ -119,7 +126,7 @@ public class Simulation implements Runnable {
             }
 
             try {
-                Thread.sleep(1000); // Opóźnienie między dniami
+                Thread.sleep(500); // Opóźnienie między dniami
             } catch (InterruptedException e) {
                 System.out.println("Simulation interrupted.");
                 Thread.currentThread().interrupt();
@@ -129,6 +136,7 @@ public class Simulation implements Runnable {
 
         System.out.println("Simulation ended.");
     }
+
 
 
 
@@ -170,6 +178,57 @@ public class Simulation implements Runnable {
         System.out.println("Animal thread ended for: " + animal);
     }
 
+    private Animal resolveConflict(List<Animal> candidates) {
+        candidates.sort(Comparator
+                .comparingInt(Animal::getEnergy)
+                .thenComparingInt(Animal::getAge)
+                .thenComparingInt(Animal::getChildrenCount)
+                .reversed()
+        );
+        return candidates.get(0);
+    }
+
+
+
+
+    private void reproduceAnimalsAt(Vector2d position) {
+        List<Animal> animalsAtPosition = map.getAnimals().get(position);
+        if (animalsAtPosition.size() < 2) return;
+
+        animalsAtPosition.sort(Comparator.comparingInt(Animal::getEnergy).reversed());
+        Animal parent1 = animalsAtPosition.get(0);
+        Animal parent2 = animalsAtPosition.get(1);
+
+        if (parent1.getMoves().isEmpty() || parent2.getMoves().isEmpty()) {
+            System.err.println("Error: One or both parents have empty genotypes. Skipping reproduction.");
+            return;
+        }
+
+        if (parent1.getEnergy() >= minEnergy && parent2.getEnergy() >= minEnergy) {
+            if (map instanceof EarthMap) {
+                EarthMap earthMap = (EarthMap) map;
+                Animal child = earthMap.reproduce(parent1, parent2);
+                try {
+                    map.place(child); // Dodaj dziecko do mapy
+
+                    // Dodaj dziecko do listy `animals`
+                    animals.add(child);
+
+                    // Wygeneruj nową sekwencję ruchów dla dziecka
+                    List<Integer> childDirections = SimulationInputGenerator.generateRandomMoveSequences(1, 5, 20).get(0);
+                    directionSequences.add(childDirections);
+
+                    // Debug: Informacja o nowo narodzonym zwierzęciu
+                    System.out.println("New animal born at " + child.getPosition() + " with energy: " + child.getEnergy());
+                } catch (IncorrectPositionException e) {
+                    System.err.println("Error placing animal: " + e.getMessage());
+                }
+            } else {
+                System.err.println("Reproduction is not supported on this map type.");
+            }
+        }
+    }
+
 
 
 
@@ -177,9 +236,3 @@ public class Simulation implements Runnable {
 
 
 }
-
-
-
-
-
-

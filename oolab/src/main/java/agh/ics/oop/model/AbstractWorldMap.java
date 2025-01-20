@@ -70,13 +70,11 @@ public abstract class AbstractWorldMap implements WorldMap{
     public synchronized void place(Animal animal) throws IncorrectPositionException {
         Vector2d position = animal.getPosition();
 
-        if (!canMoveTo(position)) {
-            throw new IncorrectPositionException(position);
-        }
-
         animals.computeIfAbsent(position, k -> new ArrayList<>()).add(animal);
         informObservers("Animal placed at: " + position);
     }
+
+
 
 
     public Map<Vector2d, Plant> getPlants() {
@@ -133,6 +131,10 @@ public abstract class AbstractWorldMap implements WorldMap{
 
 
 
+    @Override
+    public boolean canMoveTo(Vector2d position) {
+        return true; // Pozwala na wchodzenie wielu zwierząt na to samo pole
+    }
 
 
 

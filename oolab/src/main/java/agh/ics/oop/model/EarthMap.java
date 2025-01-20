@@ -63,9 +63,9 @@ public class EarthMap extends EquatorialForest {
             // Usuń zwierzę ze starej pozycji
             List<Animal> animalsAtOldPosition = animals.get(oldPosition);
             if (animalsAtOldPosition != null) {
-                animalsAtOldPosition.remove(animal);
+                animalsAtOldPosition.remove(animal); // Usuń zwierzę z listy
                 if (animalsAtOldPosition.isEmpty()) {
-                    animals.remove(oldPosition); // Usuń pozycję, jeśli lista jest pusta
+                    animals.remove(oldPosition); // Usuń całą pozycję, jeśli lista jest pusta
                 }
             }
 
@@ -73,14 +73,14 @@ public class EarthMap extends EquatorialForest {
             animals.putIfAbsent(newPosition, new ArrayList<>());
             animals.get(newPosition).add(animal);
 
-            // Aktualizuj pozycję zwierzęcia
+            // Zaktualizuj pozycję zwierzęcia
             animal.setPosition(newPosition);
+        }
 
-            // Sprawdź, czy na nowej pozycji jest roślina
-            Plant plant = plants.get(newPosition);
-            if (plant != null) {
-                manager.plantConsume(animal, plant); // Zwierzę konsumuje roślinę
-            }
+        // Sprawdź, czy na nowej pozycji jest roślina
+        Plant plant = plants.get(newPosition);
+        if (plant != null) {
+            manager.plantConsume(animal, plant); // Zwierzę konsumuje roślinę
         }
 
         // Zmniejsz energię zwierzęcia za ruch
@@ -99,6 +99,13 @@ public class EarthMap extends EquatorialForest {
 
 
 
+    @Override
+    public boolean canMoveTo(Vector2d position) {
+        return true; // Możliwość wejścia na dowolne pole
+    }
+
+
+
 
 
 
@@ -108,53 +115,87 @@ public class EarthMap extends EquatorialForest {
         return animals.containsKey(position) || plants.containsKey(position); // Sprawdza zajętość przez zwierzęta i rośliny
     }
 
-    public Animal reproduce(Animal parent1, Animal parent2) {
-        int childEnergy = 2*minEnergy;
 
-        parent1.incrementEnergy(-minEnergy);
-        parent2.incrementEnergy(-minEnergy);
+    private List<MoveDirection> createChildGenotype(Animal parent1, Animal parent2, double ratioParent1) {
+        List<MoveDirection> moves1 = parent1.getMoves();
+        List<MoveDirection> moves2 = parent2.getMoves();
 
-        ArrayList<MoveDirection> childGenotype = createChildGenotype(parent1, parent2);
-
-        Animal child = new Animal(parent1.getPosition(),childEnergy);
-        child.setMoves(childGenotype);
-        return child;
-    }
-
-    public ArrayList<MoveDirection> createChildGenotype(Animal parent1, Animal parent2) {
-        int totalEnergy = 2*minEnergy;
-        double ratioParent1 = (double) parent1.getEnergy() / totalEnergy;
-        double ratioParent2 = (double) parent2.getEnergy() / totalEnergy;
-
-        Random random = new Random();
-        boolean takeRightFromStronger = random.nextBoolean();
-
-        int breakpoint1 = (int) (parent1.getMoves().size() * ratioParent1);
-        int breakpoint2 = (int) (parent2.getMoves().size() * ratioParent2);
-
-        ArrayList<MoveDirection> childGenotype = new ArrayList<>();
-
-        if (takeRightFromStronger) {
-            childGenotype.addAll(parent1.getMoves().subList(0, breakpoint1));
-            childGenotype.addAll(parent2.getMoves().subList(breakpoint2, parent2.getMoves().size()));
-        } else {
-            childGenotype.addAll(parent2.getMoves().subList(0, breakpoint2));
-            childGenotype.addAll(parent1.getMoves().subList(breakpoint1, parent1.getMoves().size()));
+        // Sprawdzenie, czy genotypy są poprawne
+        if (moves1.isEmpty() || moves2.isEmpty()) {
+            throw new IllegalStateException("Parent genotypes cannot be empty.");
         }
 
-        mutateGenotype(childGenotype);
+        int size1 = moves1.size();
+        int size2 = moves2.size();
+
+        int breakpoint1 = Math.max(0, Math.min(size1, (int) (size1 * ratioParent1)));
+        int breakpoint2 = Math.max(0, Math.min(size2, size2 - breakpoint1));
+
+        List<MoveDirection> childGenotype = new ArrayList<>();
+        if (new Random().nextBoolean()) {
+            // Lewa strona od rodzica 1, prawa od rodzica 2
+            childGenotype.addAll(moves1.subList(0, breakpoint1));
+            childGenotype.addAll(moves2.subList(breakpoint2, size2));
+        } else {
+            // Lewa strona od rodzica 2, prawa od rodzica 1
+            childGenotype.addAll(moves2.subList(0, breakpoint2));
+            childGenotype.addAll(moves1.subList(breakpoint1, size1));
+        }
 
         return childGenotype;
     }
 
-    public static void mutateGenotype(ArrayList<MoveDirection> genotype) {
-        ArrayList<MoveDirection> m = new ArrayList<>(List.of(MoveDirection.FORWARD,MoveDirection.RIGHT,MoveDirection.BACKWARD,MoveDirection.LEFT));
-        Random random = new Random();
-        int numberOfMutations = random.nextInt(genotype.size());
 
-        for (int i = 0; i < numberOfMutations; i++) {
+
+
+
+
+    private void mutateGenotype(List<MoveDirection> genotype) {
+        if (genotype.isEmpty()) {
+            System.err.println("Error: Genotype is empty. No mutations applied.");
+            return;
+        }
+
+        Random random = new Random();
+        int mutations = random.nextInt(genotype.size() + 1); // Liczba mutacji (od 0 do rozmiaru genotypu)
+
+        for (int i = 0; i < mutations; i++) {
             int mutationIndex = random.nextInt(genotype.size());
-            genotype.set(mutationIndex, m.get(random.nextInt(4)));
+            genotype.set(mutationIndex, MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
         }
     }
+
+
+
+
+
+
+
+    public Animal reproduce(Animal parent1, Animal parent2) {
+        int totalEnergy = parent1.getEnergy() + parent2.getEnergy();
+        double ratioParent1 = (double) parent1.getEnergy() / totalEnergy;
+
+        // Stwórz genotyp dziecka
+        List<MoveDirection> childGenotype = createChildGenotype(parent1, parent2, ratioParent1);
+        mutateGenotype(childGenotype);
+
+        // Rodzice tracą energię na rzecz dziecka
+        parent1.incrementEnergy(-minEnergy);
+        parent2.incrementEnergy(-minEnergy);
+
+        // Stwórz dziecko
+        Animal child = new Animal(parent1.getPosition(), 2 * minEnergy);
+        child.setMoves(childGenotype);
+        child.setDirection(MapDirection.values()[new Random().nextInt(MapDirection.values().length)]);
+
+        // Rodzice zwiększają licznik dzieci
+        parent1.incrementChildrenCount();
+        parent2.incrementChildrenCount();
+
+        return child;
+    }
+
+
+
+
 }
