@@ -52,7 +52,7 @@ public class EquatorialForest extends AbstractWorldMap {
 
     @Override
     public void growPlants() {
-        growPlants(0,10); // Domyślne wywołanie z `initialCount = 0` - potrzebne do generowanie drzew na starcie i potem losowo
+        growPlants(0,10); // Domyślne wywołanie z initialCount = 0 - potrzebne do generowanie drzew na starcie i potem losowo
     }
 
     public void growPlants(int initialCount, int energy) {

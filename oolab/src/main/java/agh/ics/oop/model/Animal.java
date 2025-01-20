@@ -18,7 +18,7 @@ public class Animal implements WorldElement {
         this.direction = MapDirection.NORTH;
         this.position = position;
         this.energy = energy;
-        this.moves = new ArrayList<>();
+        this.moves = generateDefaultMoves(); // Dodaj tę linię
     }
 
     public void setMoves(List<MoveDirection> moves) {
@@ -36,6 +36,24 @@ public class Animal implements WorldElement {
     public List<MoveDirection> getMoves() {
         return moves;
     }
+
+    public void setDirection(MapDirection direction) {
+        this.direction = direction;
+    }
+
+    private List<MoveDirection> generateDefaultMoves() {
+        Random random = new Random();
+        List<MoveDirection> moves = new ArrayList<>();
+        int movesCount = random.nextInt(10) + 5; // Długość genotypu od 5 do 15
+
+        for (int i = 0; i < movesCount; i++) {
+            moves.add(MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
+        }
+
+        return moves;
+    }
+
+
 
     public Animal() {
         this(new Vector2d(2,2),10);
@@ -77,17 +95,17 @@ public class Animal implements WorldElement {
         // Oblicz nową pozycję
         Vector2d newPosition = this.position.add(this.direction.toUnitVector());
 
-        // Wrapowanie w poziomie
-        if (newPosition.getX() >= mapWidth) {
-            newPosition = new Vector2d(0, newPosition.getY());
-        } else if (newPosition.getX() < 0) {
-            newPosition = new Vector2d(mapWidth - 1, newPosition.getY());
-        }
-
-        // Odbijanie w pionie
+        // Odbijanie w pionie (góra-dół)
         if (newPosition.getY() >= mapHeight || newPosition.getY() < 0) {
             this.direction = this.direction.opposite(); // Obrót o 180°
-            newPosition = this.position; // Zwierzak zostaje w miejscu
+            newPosition = this.position.add(this.direction.toUnitVector()); // Oblicz nową pozycję po odbiciu
+        }
+
+        // Wrapowanie w poziomie (lewo-prawo)
+        if (newPosition.getX() >= mapWidth) {
+            newPosition = new Vector2d(0, newPosition.getY()); // Przejście na lewą krawędź
+        } else if (newPosition.getX() < 0) {
+            newPosition = new Vector2d(mapWidth - 1, newPosition.getY()); // Przejście na prawą krawędź
         }
 
         // Sprawdź, czy nowa pozycja jest dostępna
@@ -98,12 +116,33 @@ public class Animal implements WorldElement {
         // Zmniejszenie energii
         this.energy--;
 
-        // Informacja debugowa
+        // Debugowanie
         System.out.println("Animal moved to " + this.position + ", remaining energy: " + this.energy);
     }
 
 
 
+
+
+
+    private int age = 0; // Wiek zwierzęcia
+    private int childrenCount = 0; // Liczba dzieci
+
+    public int getAge() {
+        return age;
+    }
+
+    public void incrementAge() {
+        age++;
+    }
+
+    public int getChildrenCount() {
+        return childrenCount;
+    }
+
+    public void incrementChildrenCount() {
+        childrenCount++;
+    }
 
 
 }

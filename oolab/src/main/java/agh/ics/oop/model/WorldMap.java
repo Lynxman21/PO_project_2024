@@ -3,6 +3,9 @@ package agh.ics.oop.model;
 import agh.ics.oop.model.exceptions.IncorrectPositionException;
 import agh.ics.oop.model.util.Boundary;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * The interface responsible for interacting with the map of the world.
  * Assumes that Vector2d and MoveDirection classes are defined.
@@ -49,4 +52,7 @@ public interface WorldMap extends agh.ics.oop.model.MoveValidator {
     WorldElement objectAt(Vector2d position);
 
     void removeAnimal(Vector2d position,Animal animal);
+
+    Map<Vector2d, List<Animal>> getAnimals();
+
 }

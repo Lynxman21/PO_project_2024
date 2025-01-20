@@ -9,5 +9,8 @@ public interface MoveValidator {
      *            The position checked for the movement possibility.
      * @return True if the object can move to that position.
      */
-    boolean canMoveTo(Vector2d position);
+    default boolean canMoveTo(Vector2d position) {
+        return true; // Domyślna logika: zawsze można się poruszyć
+    }
 }
+
