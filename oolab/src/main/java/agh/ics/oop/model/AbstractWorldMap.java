@@ -31,10 +31,8 @@ public abstract class AbstractWorldMap implements WorldMap{
             if (animalsAtPosition.isEmpty()) {
                 animals.remove(position);
             }
-            informObservers("Animal removed from: " + position);
         }
     }
-
 
     public abstract void growPlants();
 
@@ -64,7 +62,6 @@ public abstract class AbstractWorldMap implements WorldMap{
         Vector2d position = animal.getPosition();
 
         animals.computeIfAbsent(position, k -> new ArrayList<>()).add(animal);
-        informObservers("Animal placed at: " + position);
     }
 
     public Map<Vector2d, Plant> getPlants() {
@@ -111,7 +108,7 @@ public abstract class AbstractWorldMap implements WorldMap{
             }
 
             animals.computeIfAbsent(newPosition, k -> new ArrayList<>()).add(animal);
-            informObservers("Animal moved to: " + newPosition);
+            informObservers("");
         }
     }
 

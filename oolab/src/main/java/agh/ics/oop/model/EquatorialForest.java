@@ -20,8 +20,8 @@ public class EquatorialForest extends AbstractWorldMap {
         initializeFields();
     }
 
-    public void removePlant(Vector2d position) {
-        this.plants.remove(position);
+    public synchronized void removePlant(Vector2d position) {
+        plants.remove(position); // Synchronizowany dostęp do usuwania
     }
 
     private void initializeFields() {
@@ -40,8 +40,12 @@ public class EquatorialForest extends AbstractWorldMap {
         }
     }
 
-    public Map<Vector2d, Plant> getPlants() {
-        return plants; // Rośliny są przechowywane w Map<Vector2d, Plant>
+    public synchronized void addPlant(Vector2d position, Plant plant) {
+        plants.put(position, plant); // Synchronizowany dostęp do modyfikacji
+    }
+
+    public synchronized Map<Vector2d, Plant> getPlants() {
+        return new HashMap<>(plants); // Zwróć kopię mapy, aby uniknąć modyfikacji podczas iteracji
     }
 
     @Override
@@ -50,43 +54,70 @@ public class EquatorialForest extends AbstractWorldMap {
         return !animals.containsKey(position);
     }
 
+
     @Override
     public void growPlants() {
-        growPlants(0,10); // Domyślne wywołanie z initialCount = 0 - potrzebne do generowanie drzew na starcie i potem losowo
+        growPlants(0, 10); // Domyślne wywołanie z initialCount = 0 - generowanie losowych drzew w czasie symulacji
     }
 
     public void growPlants(int initialCount, int energy) {
-        plants.entrySet().removeIf(entry -> animals.containsKey(entry.getKey())); // Usuń zajęte rośliny
+        // Usuń rośliny, które są zajęte przez zwierzęta
+        plants.entrySet().removeIf(entry -> animals.containsKey(entry.getKey()));
 
         int plantsToGrow = initialCount > 0 ? initialCount : random.nextInt(10) + 1;
 
         for (int i = 0; i < plantsToGrow; i++) {
-            boolean preferPreferred = random.nextDouble() < 0.8; // Preferowane pola
+            boolean preferPreferred = random.nextDouble() < 0.8; // 80% szans na preferowane pola
             Set<Vector2d> targetFields = preferPreferred ? preferredFields : nonPreferredFields;
 
             // Filtruj dostępne pola
             List<Vector2d> availableFields = targetFields.stream()
-                    .filter(field -> !plants.containsKey(field)) // Pole nie może być zajęte przez inną roślinę
+                    .filter(field -> !plants.containsKey(field) && !animals.containsKey(field)) // Pole nie może być zajęte
                     .toList();
 
             if (!availableFields.isEmpty()) {
-                Vector2d position = availableFields.get(random.nextInt(availableFields.size())); // Losowe pole
+                Vector2d position = availableFields.get(random.nextInt(availableFields.size())); // Wybór losowego pola
                 boolean isLarge = preferPreferred && random.nextDouble() < 0.2; // 20% szans na duże drzewo
 
                 if (isLarge) {
+                    // Duże drzewo - sprawdzenie dostępności wszystkich pól 2x2
                     List<Vector2d> area = new Plant(position, true, energy).getArea();
-                    if (area.stream().allMatch(field -> field.getX() < width && field.getY() < height)) {
+                    boolean canPlaceLargeTree = area.stream()
+                            .allMatch(field -> field.getX() >= 0 && field.getY() >= 0 &&
+                                    field.getX() < width && field.getY() < height &&
+                                    !plants.containsKey(field) && !animals.containsKey(field));
+
+                    if (canPlaceLargeTree) {
                         Plant largePlant = new Plant(position, true, energy);
                         for (Vector2d field : area) {
-                            plants.put(field, largePlant);
+                            plants.put(field, largePlant); // Zajmij wszystkie pola dla dużego drzewa
                         }
+                        System.out.println("Large plant placed at: " + position);
+                    } else {
+                        System.out.println("Cannot place large plant at: " + position);
                     }
                 } else {
+                    // Małe drzewo - zajmuje jedno pole
                     plants.put(position, new Plant(position, false, energy));
                 }
+            } else {
+                System.out.println("No free fields available for plants.");
+                break;
             }
         }
     }
+
+
+
+
+    public int getFreeFieldsCount() {
+        int totalFields = width * height; // Całkowita liczba pól na mapie
+        int animalsCount = animals.values().stream().mapToInt(List::size).sum(); // Liczba zwierząt na mapie
+        return totalFields - animalsCount; // Wolne pola = całkowite pola - liczba zwierząt
+    }
+
+
+
 
     @Override
     public void move(Animal animal, MoveDirection direction) {

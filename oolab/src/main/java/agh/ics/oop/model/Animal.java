@@ -9,22 +9,36 @@ public class Animal implements WorldElement {
     private int energy;
     private List<MoveDirection> moves;
     private int age = 0; // Wiek zwierzęcia
-//    private int childrenCount = 0; // Liczba dzieci
     private int lifeLen;
     private int childrenCount;
+    private final int genLen;
+    private AnimalStatistics statistics; // Przechowuje statystyki
 
-    public Animal(Vector2d position,int energy) {
+    public Animal(Vector2d position,int energy,int genLen) {
         this.direction = MapDirection.NORTH;
         this.position = position;
         this.energy = energy;
-        this.moves = generateDefaultMoves(); // Dodaj tę linię
+        this.moves = generateDefaultMoves(10); // Dodaj tę linię
         this.lifeLen = 0;
         this.childrenCount = 0;
+        this.genLen = genLen;
+        // Tworzenie obiektu statystyk
+        this.statistics = new AnimalStatistics(energy, moves);
+    }
+
+    public AnimalStatistics getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(AnimalStatistics statistics) {
+        this.statistics = statistics;
     }
 
     public void incrementLifeLen() {
-        lifeLen++;
+        this.lifeLen++;
+        this.statistics.updateLifeLen(this.lifeLen); // Aktualizuj statystykę w AnimalStatistics
     }
+
 
     public void incrementChildrenCount() {
         childrenCount++;
@@ -44,7 +58,6 @@ public class Animal implements WorldElement {
                 .map(Map.Entry::getKey)
                 .orElse(null); // Zwróć null, jeśli lista jest pusta
     }
-
 
     public int getLifeLen() {
         return lifeLen;
@@ -74,18 +87,18 @@ public class Animal implements WorldElement {
         this.direction = direction;
     }
 
-    private List<MoveDirection> generateDefaultMoves() {
+    private List<MoveDirection> generateDefaultMoves(int length) {
         Random random = new Random();
         List<MoveDirection> moves = new ArrayList<>();
+
         for (int i = 0; i < genLen; i++) {
             moves.add(MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
         }
-
         return moves;
     }
 
     public Animal() {
-        this(new Vector2d(2,2),10);
+        this(new Vector2d(2,2),10,10);
     }
 
     @Override
@@ -148,13 +161,5 @@ public class Animal implements WorldElement {
         // Debugowanie
         System.out.println("Animal moved to " + this.position + ", remaining energy: " + this.energy);
     }
-
-//    public int getAge() {
-//        return age;
-//    }
-//
-//    public void incrementAge() {
-//        age++;
-//    }
 
 }

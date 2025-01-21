@@ -90,8 +90,7 @@ public class EarthMap extends EquatorialForest {
             this.removeAnimal(newPosition, animal);
         }
 
-        // Powiadom obserwatorów o zmianie pozycji
-        informObservers("Animal moved to: " + newPosition);
+        informObservers("");
     }
 
     @Override
@@ -108,39 +107,39 @@ public class EarthMap extends EquatorialForest {
         List<MoveDirection> moves1 = parent1.getMoves();
         List<MoveDirection> moves2 = parent2.getMoves();
 
-        // Sprawdzenie, czy genotypy są poprawne
-        if (moves1.isEmpty() || moves2.isEmpty()) {
-            throw new IllegalStateException("Parent genotypes cannot be empty.");
-        }
-
         int size1 = moves1.size();
         int size2 = moves2.size();
 
-        int breakpoint1 = Math.max(0, Math.min(size1, (int) (size1 * ratioParent1)));
-        int breakpoint2 = Math.max(0, Math.min(size2, size2 - breakpoint1));
+        int breakpoint1 = (int) (size1 * ratioParent1);
+        int breakpoint2 = size2 - breakpoint1;
 
         List<MoveDirection> childGenotype = new ArrayList<>();
-        if (new Random().nextBoolean()) {
-            // Lewa strona od rodzica 1, prawa od rodzica 2
+        Random random = new Random();
+
+        // Losuj stronę podziału: true -> moves1 z lewej, false -> moves2 z lewej
+        boolean moves1Left = random.nextBoolean();
+
+        if (moves1Left) {
+            // Lewa strona od moves1, prawa od moves2
             childGenotype.addAll(moves1.subList(0, breakpoint1));
-            childGenotype.addAll(moves2.subList(breakpoint2, size2));
+            childGenotype.addAll(moves2.subList(size2 - breakpoint2, size2));
         } else {
-            // Lewa strona od rodzica 2, prawa od rodzica 1
+            // Lewa strona od moves2, prawa od moves1
             childGenotype.addAll(moves2.subList(0, breakpoint2));
-            childGenotype.addAll(moves1.subList(breakpoint1, size1));
+            childGenotype.addAll(moves1.subList(size1 - breakpoint1, size1));
         }
 
         return childGenotype;
     }
 
-    private void mutateGenotype(List<MoveDirection> genotype) {
+
+    private void mutateGenotype(List<MoveDirection> genotype, int minMutate, int maxMutate) {
         if (genotype.isEmpty()) {
-            System.err.println("Error: Genotype is empty. No mutations applied.");
-            return;
+            throw new IllegalStateException("Genotype is empty. No mutations applied.");
         }
 
         Random random = new Random();
-        int mutations = random.nextInt(genotype.size() + 1); // Liczba mutacji (od 0 do rozmiaru genotypu)
+        int mutations = random.nextInt(maxMutate - minMutate + 1) + minMutate;
 
         for (int i = 0; i < mutations; i++) {
             boolean type = random.nextBoolean();
@@ -154,20 +153,20 @@ public class EarthMap extends EquatorialForest {
         }
     }
 
-    public Animal reproduce(Animal parent1, Animal parent2, Statistics statistics) {
+    public Animal reproduce(Animal parent1, Animal parent2, Statistics statistics, int minMutate, int maxMutate, int genLen) {
         int totalEnergy = parent1.getEnergy() + parent2.getEnergy();
         double ratioParent1 = (double) parent1.getEnergy() / totalEnergy;
 
         // Stwórz genotyp dziecka
         List<MoveDirection> childGenotype = createChildGenotype(parent1, parent2, ratioParent1);
-        mutateGenotype(childGenotype);
+        mutateGenotype(childGenotype,minMutate,maxMutate);
 
         // Rodzice tracą energię na rzecz dziecka
         parent1.incrementEnergy(-minEnergy);
         parent2.incrementEnergy(-minEnergy);
 
         // Stwórz dziecko
-        Animal child = new Animal(parent1.getPosition(), 2 * minEnergy);
+        Animal child = new Animal(parent1.getPosition(), 2 * minEnergy, genLen);
         child.setMoves(childGenotype);
         child.setDirection(MapDirection.values()[new Random().nextInt(MapDirection.values().length)]);
 

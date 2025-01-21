@@ -4,35 +4,37 @@ import agh.ics.oop.model.Animal;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Statistics {
 
     @FXML
-    private Label dayDisplay;
+    public Label dayDisplay;
 
     @FXML
-    private Label animalCountDisplay;
+    public Label animalCountDisplay;
 
     @FXML
-    private Label plantDisplay;
+    public Label plantDisplay;
 
     @FXML
-    private Label emptyCellsDisplay;
+    public Label emptyCellsDisplay;
 
     @FXML
-    private Label mostCommonGenomDisplay;
+    public Label mostCommonGenomDisplay;
 
     @FXML
-    private Label averageEnergyDisplay;
+    public Label averageEnergyDisplay;
 
     @FXML
-    private Label averageLifeDisplay;
+    public Label averageLifeDisplay;
 
     @FXML
-    private Label averageChildrenCountDisplay;
+    public Label averageChildrenCountDisplay;
 
     private int day;
     private int animalCount;
@@ -45,6 +47,8 @@ public class Statistics {
     private int averageCountOfChildren;
     private int cells;
     private final int additionalPlants;
+    private int columns;
+    private int rows;
 
     public Statistics(WorldMap map, List<Animal> animals, int animalCount, int plantCount, int columns, int rows, int minEnergy) {
         this.day = 0;
@@ -58,6 +62,8 @@ public class Statistics {
         this.cells = rows * columns;
         this.mostCommonGenom = calculateMostCommonGenom(animals); // Oblicz najpopularniejszy genom
         this.additionalPlants = plantCount;
+        this.columns = columns;
+        this.rows = rows;
     }
 
     private MoveDirection calculateMostCommonGenom(List<Animal> animals) {
@@ -110,7 +116,7 @@ public class Statistics {
     }
 
     public void newEmptyCells() {
-        emptyCells = cells - animalCount - plantCount;
+        emptyCells = 0;
     }
 
     public void newAverageEnergy(List<Animal> animals) {
@@ -131,4 +137,57 @@ public class Statistics {
     public void newMostCommonGenom(List<Animal> animals) {
         this.mostCommonGenom = calculateMostCommonGenom(animals);
     }
+
+    public void displayStats() {
+        System.out.println("dayDisplay: " + dayDisplay); // Sprawdzenie, czy pole jest null
+        System.out.println("Day: " + day);
+
+        if (dayDisplay != null) dayDisplay.setText(String.valueOf(day));
+        if (animalCountDisplay != null) animalCountDisplay.setText(String.valueOf(animalCount));
+        if (plantDisplay != null) plantDisplay.setText(String.valueOf(plantCount));
+        if (emptyCellsDisplay != null) emptyCellsDisplay.setText(String.valueOf(emptyCells));
+        if (mostCommonGenomDisplay != null) mostCommonGenomDisplay.setText(mostCommonGenom != null ? mostCommonGenom.toString() : "None");
+        if (averageEnergyDisplay != null) averageEnergyDisplay.setText(String.valueOf(averageEnergy));
+        if (averageLifeDisplay != null) averageLifeDisplay.setText(String.valueOf(averageLifeLen));
+        if (averageChildrenCountDisplay != null) averageChildrenCountDisplay.setText(String.valueOf(averageCountOfChildren));
+    }
+
+    public void updateEmptyFields(EquatorialForest forest) {
+        emptyCells = forest.getFreeFieldsCount(); // Pobierz liczbę wolnych pól tylko względem zwierząt
+        if (emptyCellsDisplay != null) {
+            emptyCellsDisplay.setText(String.valueOf(emptyCells)); // Zaktualizuj wyświetlanie w GUI
+        }
+    }
+
+    public void updateCounts() {
+        this.animalCount = map.getAnimals().values().stream().mapToInt(List::size).sum(); // Suma wszystkich zwierząt
+        this.plantCount = map instanceof EquatorialForest ? ((EquatorialForest) map).getPlants().size() : 0; // Liczba roślin (jeśli mapa obsługuje rośliny)
+    }
+
+    public void newPlantCount(Map<Vector2d, Plant> plants) {
+        Set<Plant> uniquePlants = new HashSet<>(plants.values());
+        this.plantCount = uniquePlants.size();
+    }
+
+    public void saveToCSV(String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            // Nagłówki kolumn
+            writer.write("Day,Animal Count,Plant Count,Empty Cells,Most Common Genotype,Average Energy,Average Life Length,Average Children Count\n");
+
+            // Dane statystyk
+            writer.write(day + "," +
+                    animalCount + "," +
+                    plantCount + "," +
+                    emptyCells + "," +
+                    (mostCommonGenom != null ? mostCommonGenom.toString() : "None") + "," +
+                    averageEnergy + "," +
+                    averageLifeLen + "," +
+                    averageCountOfChildren + "\n");
+
+            System.out.println("Statistics saved to " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error saving statistics to CSV: " + e.getMessage());
+        }
+    }
+
 }
