@@ -7,11 +7,13 @@ public class Plant implements WorldElement {
     private final Vector2d position;
     private final boolean isLarge;
     private final int energy;
+    private final boolean isMainPart; // Określa, czy to główna część dużego drzewa
 
     public Plant(Vector2d position, boolean isLarge,int energy) {
         this.position = position;
         this.isLarge = isLarge;
         this.energy = isLarge ? energy+20 : energy;
+        this.isMainPart = !isLarge || position.equals(calculateMainPosition(position));
     }
 
     public boolean isLarge() {
@@ -43,6 +45,15 @@ public class Plant implements WorldElement {
 
     public int getEnergyValue() {
         return energy;
+    }
+
+    // Metoda obliczająca główną pozycję dużego drzewa
+    private Vector2d calculateMainPosition(Vector2d position) {
+        return position.add(new Vector2d(-1, -1));
+    }
+
+    public boolean isMainPart() {
+        return isMainPart;
     }
 }
 

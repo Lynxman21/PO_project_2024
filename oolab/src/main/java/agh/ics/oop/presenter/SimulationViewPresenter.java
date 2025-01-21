@@ -8,6 +8,7 @@ import agh.ics.oop.model.util.SimulationInputGenerator;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
@@ -15,12 +16,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import java.util.*;
 
 public class SimulationViewPresenter implements MapChangeListener {
     private WorldMap map;
+
+    @FXML
+    private Button pauseButton;
 
     @FXML
     private Label infoLabel;
@@ -55,6 +60,22 @@ public class SimulationViewPresenter implements MapChangeListener {
     @FXML
     private GridPane mapGrid;
 
+    @FXML
+    private Label selectedAnimalPosition;
+
+    @FXML
+    private Label selectedAnimalEnergy;
+
+    @FXML
+    private Label selectedAnimalChildren;
+
+    @FXML
+    private Label selectedAnimalLifeLength;
+
+    @FXML
+    private Label selectedAnimalGenotype;
+
+
 
     private int widthCeil = 50;
     private int heightCeil = 50;
@@ -80,6 +101,14 @@ public class SimulationViewPresenter implements MapChangeListener {
 
                 if (simulation != null) {
                     simulation.stop();
+                    if (statistics != null) {
+                        // Generowanie nazwy pliku z dynamiczną datą i czasem
+                        String fileName = "statistics_" +
+                                java.time.LocalDateTime.now().format(
+                                        java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+                                ) + ".csv";
+                        statistics.saveToCSV(fileName); // Zapis danych do pliku
+                    }
                     if (simulationThread != null && simulationThread.isAlive()) {
                         simulationThread.interrupt();
                         System.out.println("Simulation thread interrupted.");
@@ -94,6 +123,8 @@ public class SimulationViewPresenter implements MapChangeListener {
             bindStatistics(statistics); // Powiąż statystyki z elementami GUI
         }
     }
+
+
 
 
     public void bindStatistics(Statistics statistics) {
@@ -128,28 +159,23 @@ public class SimulationViewPresenter implements MapChangeListener {
         yMax = boundary.upperRight().getY();
     }
 
-    private void addCollumnsAndRows() {
-        for (int index=0;index<mapWidth;index++) {
-            mapGrid.getColumnConstraints().add(new ColumnConstraints(widthCeil));
-            Label labelW = new Label(Integer.toString(boundary.lowerLeft().getX() + index+1));
-            mapGrid.add(labelW,index+1,0);
-            GridPane.setHalignment(labelW, HPos.CENTER);
-        }
-        for (int index=0;index<mapHeight;index++) {
-            mapGrid.getRowConstraints().add(new RowConstraints(heightCeil));
-            Label labelH = new Label(Integer.toString(boundary.lowerLeft().getY() + index+1));
-            mapGrid.add(labelH,0,index+1);
-            GridPane.setHalignment(labelH, HPos.CENTER);
-        }
-    }
-
     @Override
     public void mapChanged(WorldMap worldMap, String message) {
         Platform.runLater(() -> {
             infoLabel.setText(message); // Aktualizacja wiadomości w GUI
-            updateDynamicElements();   // Aktualizuj tylko dynamiczne elementy
+            updateDynamicElements(); // Regularna aktualizacja widoku
+
+            if (worldMap instanceof EquatorialForest) {
+                EquatorialForest forest = (EquatorialForest) worldMap;
+                int freeFields = forest.getFreeFieldsCount();
+                if (freeFields == 0) {
+                    infoLabel.setText("No more free fields for plants.");
+                }
+            }
         });
     }
+
+
 
     public void initializeMap() {
         clearGrid(); // Usuń istniejącą zawartość siatki
@@ -183,26 +209,27 @@ public class SimulationViewPresenter implements MapChangeListener {
     }
 
     public void updateDynamicElements() {
-        // Usuń dynamiczne elementy
         mapGrid.getChildren().removeIf(node -> node instanceof Rectangle && !((Rectangle) node).getFill().equals(javafx.scene.paint.Color.LIGHTYELLOW));
 
         // Dodaj rośliny
         if (map instanceof EquatorialForest) {
-            Map<Vector2d, Plant> plants = ((EquatorialForest) map).getPlants();
-            // Iteracja po kopii kluczy
-            List<Vector2d> plantPositions = new ArrayList<>(plants.keySet());
-            for (Vector2d position : plantPositions) {
-                Plant plant = plants.get(position);
+            Map<Vector2d, Plant> plantsCopy;
+            synchronized (map) { // Synchronizuj dostęp, jeśli inna część programu modyfikuje rośliny
+                plantsCopy = new HashMap<>(((EquatorialForest) map).getPlants());
+            }
+
+            for (Map.Entry<Vector2d, Plant> entry : plantsCopy.entrySet()) {
+                Vector2d position = entry.getKey();
+                Plant plant = entry.getValue();
+
                 if (plant != null) {
                     Rectangle plantRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2); // Margines 2px
                     plantRectangle.setFill(plant.isLarge() ? javafx.scene.paint.Color.DARKGREEN : javafx.scene.paint.Color.LIGHTGREEN);
 
-                    // Przelicz współrzędne na GridPane
                     int gridX = position.getX() - xMin;
                     int gridY = yMax - position.getY();
 
-                    // Dodaj element do GridPane
-                    if (gridX >= 0 && gridY >= 0) { // Sprawdzamy, czy indeksy są poprawne
+                    if (gridX >= 0 && gridY >= 0) {
                         mapGrid.add(plantRectangle, gridX, gridY);
                     }
                 }
@@ -211,57 +238,83 @@ public class SimulationViewPresenter implements MapChangeListener {
 
         // Dodaj zwierzęta
         if (map instanceof AbstractWorldMap) {
-            Map<Vector2d, List<Animal>> animals = ((AbstractWorldMap) map).getAnimals();
-            // Iteracja po kopii kluczy
-            List<Vector2d> animalPositions = new ArrayList<>(animals.keySet());
-            for (Vector2d position : animalPositions) {
-                List<Animal> animalsAtPosition = animals.get(position);
+            Map<Vector2d, List<Animal>> animalsCopy;
+            synchronized (map) { // Synchronizuj dostęp do zwierząt
+                animalsCopy = new HashMap<>(((AbstractWorldMap) map).getAnimals());
+            }
+
+            for (Map.Entry<Vector2d, List<Animal>> entry : animalsCopy.entrySet()) {
+                Vector2d position = entry.getKey();
+                List<Animal> animalsAtPosition = entry.getValue();
+
                 if (animalsAtPosition != null && !animalsAtPosition.isEmpty()) {
-                    Rectangle animalRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2); // Margines 2px
-                    animalRectangle.setFill(javafx.scene.paint.Color.BURLYWOOD); // Kolor zwierząt
+                    for (Animal animal : animalsAtPosition) {
+                        Rectangle animalRectangle = new Rectangle(800.0 / mapWidth - 2, 800.0 / mapHeight - 2);
+                        animalRectangle.setFill(getColorForEnergy(animal.getEnergy()));
 
-                    // Przelicz współrzędne na GridPane
-                    int gridX = position.getX() - xMin;
-                    int gridY = yMax - position.getY();
+                        int gridX = position.getX() - xMin;
+                        int gridY = yMax - position.getY();
 
-                    // Dodaj element do GridPane
-                    if (gridX >= 0 && gridY >= 0) { // Sprawdzamy, czy indeksy są poprawne
-                        mapGrid.add(animalRectangle, gridX, gridY);
+                        if (gridX >= 0 && gridY >= 0) {
+                            mapGrid.add(animalRectangle, gridX, gridY);
+
+                            // Dodanie obsługi kliknięcia
+                            animalRectangle.setOnMouseClicked(event -> handleAnimalClick(animal));
+                        }
                     }
                 }
             }
         }
+
+        // Aktualizacja szczegółów wybranego zwierzaka
+        updateSelectedAnimalDetails();
     }
 
-    public void initializeSimulation(int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants, int plantEnergy, int animalEnergy, int minEnergy) {
+
+
+
+
+
+    // Pomocnicza metoda do obliczenia koloru
+    private javafx.scene.paint.Color getColorForEnergy(int energy) {
+        if (energy < minEnergy) {
+            return javafx.scene.paint.Color.BURLYWOOD; // Bardzo jasny brąz
+        } else if (energy >= minEnergy && energy < 3 * minEnergy) {
+            return javafx.scene.paint.Color.SADDLEBROWN; // Średni brąz
+        } else {
+            return javafx.scene.paint.Color.rgb(70, 30, 0); // Bardzo ciemny brąz (ręcznie zdefiniowany)
+        }
+    }
+
+
+
+
+
+    public void initializeSimulation(
+            int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants,
+            int plantEnergy, int animalEnergy, int minEnergy, int plantPerDay,int minMutations, int maxMutations,
+            int genomLength, int energyForChild, int time
+    ) {
+        this.minEnergy = minEnergy; // Przypisanie minEnergy w SimulationViewPresenter
+
         PositionGenerator positionGenerator = new PositionGenerator(mapWidth, mapHeight);
         List<Vector2d> startPositions = new ArrayList<>();
 
         // Generowanie unikalnych pozycji
         for (int i = 0; i < numberOfAnimals; i++) {
             Vector2d position;
-
-            // Pętla zapewniająca unikalność pozycji
             do {
                 position = positionGenerator.generateUniquePositions(1).get(0);
             } while (startPositions.contains(position)); // Sprawdzanie unikalności
-
             startPositions.add(position);
         }
 
         // Generowanie sekwencji ruchów
-        List<List<Integer>> directionSequences = SimulationInputGenerator.generateRandomMoveSequences(
-                numberOfAnimals, 5, 20
-        );
-
-// Walidacja, czy sekwencje zostały poprawnie wygenerowane
-        if (directionSequences.isEmpty() || directionSequences.stream().anyMatch(List::isEmpty)) {
-            throw new IllegalStateException("Direction sequences are invalid: empty sequences found.");
-        }
+        List<List<Integer>> directionSequences = SimulationInputGenerator.generateRandomMoveSequences(numberOfAnimals, genomLength);
+        System.out.println(directionSequences);
 
         AbstractWorldMap map = new EarthMap(mapWidth, mapHeight, minEnergy);
 
-        // Dodaj początkowe rośliny
         if (map instanceof EquatorialForest) {
             ((EquatorialForest) map).growPlants(numberOfPlants, plantEnergy);
         }
@@ -270,17 +323,87 @@ public class SimulationViewPresenter implements MapChangeListener {
         this.setWorldMap(map);
 
         this.statistics = new Statistics(map, new ArrayList<>(), 0, 0, mapWidth, mapHeight, minEnergy);
-        bindStatistics(statistics); // Powiąż statystyki z elementami GUI
+        bindStatistics(statistics);
 
-        // Wywołaj jednorazową inicjalizację mapy
-        Platform.runLater(() -> {
-            initializeMap();
-        });
+        Platform.runLater(this::initializeMap);
 
-        // Przypisz symulację do pola klasy (to kluczowe!)
-        simulation = new Simulation(startPositions, directionSequences, map, plantEnergy, animalEnergy, minEnergy, mapWidth, mapHeight, numberOfPlants, statistics);
+        simulation = new Simulation(
+                startPositions, directionSequences, map, plantEnergy, animalEnergy,
+                minEnergy, mapWidth, mapHeight, plantPerDay, statistics, minMutations,maxMutations,genomLength,
+                energyForChild, time
+        );
         simulationThread = new Thread(simulation);
         simulationThread.start();
         System.out.println("Simulation initialized and thread started.");
     }
+
+    private boolean isPaused = false;
+
+    @FXML
+    private void handlePauseButtonClick() {
+        isPaused = !isPaused; // Przełącz między pauzą a wznowieniem
+        if (simulation != null) {
+            if (isPaused) {
+                simulation.pause(); // Wstrzymaj symulację
+                pauseButton.setText("Resume");
+            } else {
+                simulation.resume(); // Wznów symulację
+                pauseButton.setText("Pause");
+            }
+        }
+    }
+    private Animal selectedAnimal; // Pole do przechowywania wybranego zwierzaka
+
+    private void handleAnimalClick(Animal animal) {
+        selectedAnimal = animal;
+
+        // Znajdź indeks wybranego zwierzaka w directionSequences
+        if (simulation != null) {
+            selectedAnimalIndex = simulation.getAnimalIndex(animal);
+        }
+
+        updateSelectedAnimalDetails();
+    }
+
+
+
+    private int selectedAnimalIndex = -1; // Indeks wybranego zwierzaka w directionSequences
+
+    private void clearSelectedAnimalDetails() {
+        selectedAnimal = null;
+        selectedAnimalIndex = -1;
+
+        selectedAnimalPosition.setText("-");
+        selectedAnimalEnergy.setText("-");
+        selectedAnimalChildren.setText("-");
+        selectedAnimalLifeLength.setText("-");
+        selectedAnimalGenotype.setText("-");
+    }
+
+    private void updateSelectedAnimalDetails() {
+        if (selectedAnimal != null) {
+            // Sprawdź, czy zwierzak nadal istnieje
+            if (!map.getAnimals().containsKey(selectedAnimal.getPosition())) {
+                clearSelectedAnimalDetails(); // Wyczyść, jeśli zwierzak zniknął
+                return;
+            }
+
+            AnimalStatistics stats = selectedAnimal.getStatistics();
+
+            selectedAnimalPosition.setText(selectedAnimal.getPosition().toString());
+            selectedAnimalEnergy.setText(String.valueOf(selectedAnimal.getEnergy())); // Dynamiczna energia
+            selectedAnimalChildren.setText(String.valueOf(stats.getChildrenCount())); // Dynamiczna liczba dzieci
+            selectedAnimalLifeLength.setText(String.valueOf(selectedAnimal.getLifeLen())); // Dynamiczna długość życia
+
+            // Genotyp zwierzaka
+            StringBuilder genotypeString = new StringBuilder();
+            for (MoveDirection move : stats.getMoves()) {
+                genotypeString.append(move.ordinal()).append(" ");
+            }
+            selectedAnimalGenotype.setText(genotypeString.toString().trim());
+        }
+    }
+
+
+
 }

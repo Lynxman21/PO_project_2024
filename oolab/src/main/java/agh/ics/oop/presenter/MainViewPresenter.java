@@ -34,6 +34,24 @@ public class MainViewPresenter {
     @FXML
     private TextField minEnergy;
 
+    @FXML
+    private TextField plantPerDay;
+
+    @FXML
+    private TextField minMutationNumber;
+
+    @FXML
+    private TextField maxMutationNumber;
+
+    @FXML
+    private TextField genomLen;
+
+    @FXML
+    private TextField energyForChild;
+
+    @FXML
+    private TextField time;
+
     public void onSimulationStartClicked(ActionEvent actionEvent) {
         try {
             // Pobierz parametry mapy i symulacji
@@ -44,6 +62,12 @@ public class MainViewPresenter {
             int defaultPlantEnergy = Integer.parseInt(plantEnergy.getText().trim());
             int deafultAnimalEnergy = Integer.parseInt(animalEnergy.getText().trim());
             int minimumEnergy = Integer.parseInt(minEnergy.getText().trim());
+            int plantPerDayNum = Integer.parseInt(plantPerDay.getText().trim());
+            int minMutations = Integer.parseInt(minMutationNumber.getText().trim());
+            int maxMutations = Integer.parseInt(maxMutationNumber.getText().trim());
+            int genomLength = Integer.parseInt(genomLen.getText().trim());
+            int energyForNewAnimal = Integer.parseInt(energyForChild.getText().trim());
+            int dayTime = Integer.parseInt(time.getText().trim());
 
             // Walidacja danych
             if (mapWidth <= 0 || mapHeight <= 0) {
@@ -70,6 +94,31 @@ public class MainViewPresenter {
                 infoLabel.setText("Error: Minimum energy cannot be negative.");
                 return;
             }
+            if (plantPerDayNum <= 0) {
+                infoLabel.setText("Error: Count of plants cannot be negative.");
+                return;
+            }
+            if (minMutations < 0) {
+                infoLabel.setText("Error: Minimum mutations cannot be negative.");
+                return;
+            }
+            if (maxMutations < 0) {
+                infoLabel.setText("Error: Maximum mutations cannot be negative.");
+                return;
+            }
+            if (genomLength <= 0) {
+                infoLabel.setText("Error: Genom length cannot be negative.");
+                return;
+            }
+            if (energyForNewAnimal <= 0) {
+                infoLabel.setText("Error: Energy for child cannot be negative.");
+                return;
+            }
+            if (dayTime <= 0) {
+                infoLabel.setText("Error: Day time cannot be negative.");
+                return;
+            }
+
 
             // Wczytaj nową scenę symulacji
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/SimulationView.fxml"));
@@ -79,7 +128,12 @@ public class MainViewPresenter {
 
             // Pobierz kontroler i zainicjalizuj symulację
             SimulationViewPresenter simulationPresenter = loader.getController();
-            simulationPresenter.initializeSimulation(mapWidth, mapHeight, numberOfAnimals, numberOfPlants,defaultPlantEnergy,deafultAnimalEnergy,minimumEnergy);
+            simulationPresenter.initializeSimulation(
+                    mapWidth, mapHeight, numberOfAnimals, numberOfPlants,
+                    defaultPlantEnergy,deafultAnimalEnergy,minimumEnergy,
+                    plantPerDayNum,minMutations, maxMutations, genomLength,
+                    energyForNewAnimal,dayTime
+            );
 
             // Otwórz okno symulacji
             simulationStage.show();
