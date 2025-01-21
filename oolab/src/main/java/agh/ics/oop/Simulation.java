@@ -27,7 +27,8 @@ public class Simulation implements Runnable {
     private final int energyForChild;
     private final int time;
     private Animal selectedAnimal;
-
+    private final List<Animal> allAnimals = new ArrayList<>();
+    private volatile boolean paused = false;
 
     public Simulation(List<Vector2d> startPositions, List<List<Integer>> directionSequences, WorldMap map,
                       int plantEnergy, int animalEnergy, int minEnergy, int columns, int rows,
@@ -59,6 +60,7 @@ public class Simulation implements Runnable {
                 try {
                     map.place(animal);
                     animals.add(animal); // Dodaj zwierzę do listy zwierząt
+                    allAnimals.add(animal); // Dodaj do listy wszystkich zwierząt
                     System.out.println(animalEnergy);
                 } catch (IncorrectPositionException e) {
                     System.out.println("Error placing animal at " + position + ": " + e.getMessage());
@@ -145,12 +147,6 @@ public class Simulation implements Runnable {
                 statistics.newPlantCount(((EquatorialForest) map).getPlants());
             }
 
-//            Platform.runLater(() -> {
-//                if (selectedAnimal != null) {
-//                    handleAnimalClick(selectedAnimal); // Odśwież dane wybranego zwierzęcia
-//                }
-//            });
-
             Platform.runLater(statistics::displayStats); // Wywołanie metody w wątku GUI
 
             if (animals.stream().allMatch(a -> a.getEnergy() <= 0)) {
@@ -170,7 +166,6 @@ public class Simulation implements Runnable {
         System.out.println("Simulation ended.");
     }
 
-
     public int getAnimalIndex(Animal animal) {
         return animals.indexOf(animal);
     }
@@ -181,7 +176,6 @@ public class Simulation implements Runnable {
         }
         return Collections.emptyList();
     }
-
 
     public WorldMap getMap() {
         return map;
@@ -209,6 +203,8 @@ public class Simulation implements Runnable {
 
                     // Dodaj dziecko do listy `animals`
                     animals.add(child);
+                    allAnimals.add(child); // Dodaj dziecko do listy wszystkich zwierząt
+
 
                     // Wygeneruj nową sekwencję ruchów dla dziecka
                     List<Integer> childDirections = SimulationInputGenerator.generateRandomMoveSequences(1, genomLength).get(0);
@@ -225,8 +221,6 @@ public class Simulation implements Runnable {
         }
     }
 
-    private volatile boolean paused = false;
-
     public synchronized void pause() {
         paused = true;
         System.out.println("Simulation paused.");
@@ -237,5 +231,7 @@ public class Simulation implements Runnable {
         notify(); // Powiadom wątek, aby kontynuował
         System.out.println("Simulation resumed.");
     }
-
+    public List<Animal> getAllAnimals() {
+        return allAnimals;
+    }
 }

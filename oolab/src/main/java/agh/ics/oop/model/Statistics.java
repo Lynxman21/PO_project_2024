@@ -1,5 +1,6 @@
 package agh.ics.oop.model;
 
+import agh.ics.oop.Simulation;
 import agh.ics.oop.model.Animal;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -49,6 +50,8 @@ public class Statistics {
     private final int additionalPlants;
     private int columns;
     private int rows;
+    private Simulation simulation;
+
 
     public Statistics(WorldMap map, List<Animal> animals, int animalCount, int plantCount, int columns, int rows, int minEnergy) {
         this.day = 0;
@@ -169,25 +172,55 @@ public class Statistics {
         this.plantCount = uniquePlants.size();
     }
 
-    public void saveToCSV(String fileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            // Nagłówki kolumn
-            writer.write("Day,Animal Count,Plant Count,Empty Cells,Most Common Genotype,Average Energy,Average Life Length,Average Children Count\n");
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation;
+    }
 
-            // Dane statystyk
-            writer.write(day + "," +
-                    animalCount + "," +
-                    plantCount + "," +
-                    emptyCells + "," +
-                    (mostCommonGenom != null ? mostCommonGenom.toString() : "None") + "," +
-                    averageEnergy + "," +
-                    averageLifeLen + "," +
+    public void saveToCSV(String fileName, List<Animal> allAnimals, Simulation simulation) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            // Sekcja 1: Nagłówki ogólnych statystyk
+            writer.write("Day  ;  Animal Count  ;  Plant Count  ;  Empty Cells  ;  Most Common Genotype  ;  Average Energy  ;  Average Life Length  ;  Average Children Count\n");
+
+            // Dane ogólnych statystyk
+            writer.write(day + "  ;  " +
+                    animalCount + "  ;  " +
+                    plantCount + "  ;  " +
+                    emptyCells + "  ;  " +
+                    (mostCommonGenom != null ? mostCommonGenom.toString() : "None") + "  ;  " +
+                    averageEnergy + "  ;  " +
+                    averageLifeLen + "  ;  " +
                     averageCountOfChildren + "\n");
 
-            System.out.println("Statistics saved to " + fileName);
+            // Dodanie separatora między sekcjami
+            writer.write("\nDetails of Animals:\n");
+
+            // Nagłówki dla danych zwierząt
+            writer.write("\nAnimal Status  ;  Position  ;  Energy  ;  Children Count  ;  Life Length  ;  Genotype\n");
+
+            // Dane dla każdego zwierzęcia
+            int index = 0; // Indeks zwierzęcia w simulation
+            for (Animal animal : allAnimals) {
+                boolean isAlive = animal.getEnergy() > 0;
+                String status = isAlive ? "Alive" : "Dead";
+                AnimalStatistics stats = animal.getStatistics();
+
+                // Pobranie genotypu zwierzęcia
+                List<Integer> genotype = simulation.getAnimalGenotype(index);
+
+                writer.write(status + "  ;  " +
+                        animal.getPosition() + "  ;  " +
+                        animal.getEnergy() + "  ;  " +
+                        stats.getChildrenCount() + "  ;  " +
+                        stats.getLifeLen() + "  ;  " +
+                        genotype.toString() +
+                        "\n");
+
+                index++;
+            }
+
+            System.out.println("Statistics and animal details saved to " + fileName);
         } catch (IOException e) {
             System.err.println("Error saving statistics to CSV: " + e.getMessage());
         }
     }
-
 }

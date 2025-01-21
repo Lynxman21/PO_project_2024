@@ -81,7 +81,7 @@ public abstract class AbstractWorldMap implements WorldMap{
 
         Vector2d newPosition = animal.getPosition();
 
-        // Pobierz drzewa z mapy (jeśli są obsługiwane)
+        // Pobierz drzewa z mapy
         Map<Vector2d, Plant> plants = getPlants();
         if (plants.containsKey(newPosition)) {
             Plant plant = plants.get(newPosition);

@@ -8,7 +8,6 @@ public class Animal implements WorldElement {
     private Vector2d position;
     private int energy;
     private List<MoveDirection> moves;
-    private int age = 0; // Wiek zwierzęcia
     private int lifeLen;
     private int childrenCount;
     private final int genLen;
@@ -22,7 +21,6 @@ public class Animal implements WorldElement {
         this.lifeLen = 0;
         this.childrenCount = 0;
         this.genLen = genLen;
-        // Tworzenie obiektu statystyk
         this.statistics = new AnimalStatistics(energy, moves);
     }
 
@@ -38,7 +36,6 @@ public class Animal implements WorldElement {
         this.lifeLen++;
         this.statistics.updateLifeLen(this.lifeLen); // Aktualizuj statystykę w AnimalStatistics
     }
-
 
     public void incrementChildrenCount() {
         childrenCount++;
@@ -142,7 +139,6 @@ public class Animal implements WorldElement {
             newPosition = this.position.add(this.direction.toUnitVector()); // Oblicz nową pozycję po odbiciu
         }
 
-        // Wrapowanie w poziomie (lewo-prawo)
         if (newPosition.getX() >= mapWidth) {
             newPosition = new Vector2d(0, newPosition.getY()); // Przejście na lewą krawędź
         } else if (newPosition.getX() < 0) {

@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
@@ -75,6 +76,8 @@ public class SimulationViewPresenter implements MapChangeListener {
     @FXML
     private Label selectedAnimalGenotype;
 
+    @FXML
+    private Label selectedAnimalStatus;
 
 
     private int widthCeil = 50;
@@ -90,7 +93,10 @@ public class SimulationViewPresenter implements MapChangeListener {
     private Thread simulationThread;
     private Statistics statistics;
     private int minEnergy;
-
+    private boolean saveToCSVEnabled;
+    private int selectedAnimalIndex = -1; // Indeks wybranego zwierzaka w directionSequences
+    private Animal selectedAnimal; // Pole do przechowywania wybranego zwierzaka
+    private boolean isPaused = false;
 
     @FXML
     private void initialize() {
@@ -101,14 +107,21 @@ public class SimulationViewPresenter implements MapChangeListener {
 
                 if (simulation != null) {
                     simulation.stop();
-                    if (statistics != null) {
-                        // Generowanie nazwy pliku z dynamiczną datą i czasem
+
+                    if (saveToCSVEnabled && statistics != null) {
+                        // Generowanie nazwy pliku
                         String fileName = "statistics_" +
                                 java.time.LocalDateTime.now().format(
                                         java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
                                 ) + ".csv";
-                        statistics.saveToCSV(fileName); // Zapis danych do pliku
+
+                        if (map instanceof AbstractWorldMap) {
+                            Map<Vector2d, List<Animal>> animals = ((AbstractWorldMap) map).getAnimals();
+                            statistics.saveToCSV(fileName, simulation.getAllAnimals(), simulation);
+                        }
                     }
+
+
                     if (simulationThread != null && simulationThread.isAlive()) {
                         simulationThread.interrupt();
                         System.out.println("Simulation thread interrupted.");
@@ -120,12 +133,9 @@ public class SimulationViewPresenter implements MapChangeListener {
         });
 
         if (statistics != null) {
-            bindStatistics(statistics); // Powiąż statystyki z elementami GUI
+            bindStatistics(statistics); // Powiąż statystyki z GUI
         }
     }
-
-
-
 
     public void bindStatistics(Statistics statistics) {
         statistics.dayDisplay = dayDisplay;
@@ -137,7 +147,6 @@ public class SimulationViewPresenter implements MapChangeListener {
         statistics.averageLifeDisplay = averageLifeDisplay;
         statistics.averageChildrenCountDisplay = averageChildrenCountDisplay;
     }
-
 
     public void setWorldMap(WorldMap map) {
         this.map = map;
@@ -174,8 +183,6 @@ public class SimulationViewPresenter implements MapChangeListener {
             }
         });
     }
-
-
 
     public void initializeMap() {
         clearGrid(); // Usuń istniejącą zawartość siatki
@@ -270,11 +277,6 @@ public class SimulationViewPresenter implements MapChangeListener {
         updateSelectedAnimalDetails();
     }
 
-
-
-
-
-
     // Pomocnicza metoda do obliczenia koloru
     private javafx.scene.paint.Color getColorForEnergy(int energy) {
         if (energy < minEnergy) {
@@ -285,10 +287,6 @@ public class SimulationViewPresenter implements MapChangeListener {
             return javafx.scene.paint.Color.rgb(70, 30, 0); // Bardzo ciemny brąz (ręcznie zdefiniowany)
         }
     }
-
-
-
-
 
     public void initializeSimulation(
             int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants,
@@ -332,12 +330,11 @@ public class SimulationViewPresenter implements MapChangeListener {
                 minEnergy, mapWidth, mapHeight, plantPerDay, statistics, minMutations,maxMutations,genomLength,
                 energyForChild, time
         );
+        statistics.setSimulation(simulation);
         simulationThread = new Thread(simulation);
         simulationThread.start();
         System.out.println("Simulation initialized and thread started.");
     }
-
-    private boolean isPaused = false;
 
     @FXML
     private void handlePauseButtonClick() {
@@ -352,7 +349,6 @@ public class SimulationViewPresenter implements MapChangeListener {
             }
         }
     }
-    private Animal selectedAnimal; // Pole do przechowywania wybranego zwierzaka
 
     private void handleAnimalClick(Animal animal) {
         selectedAnimal = animal;
@@ -365,45 +361,36 @@ public class SimulationViewPresenter implements MapChangeListener {
         updateSelectedAnimalDetails();
     }
 
-
-
-    private int selectedAnimalIndex = -1; // Indeks wybranego zwierzaka w directionSequences
-
-    private void clearSelectedAnimalDetails() {
-        selectedAnimal = null;
-        selectedAnimalIndex = -1;
-
-        selectedAnimalPosition.setText("-");
-        selectedAnimalEnergy.setText("-");
-        selectedAnimalChildren.setText("-");
-        selectedAnimalLifeLength.setText("-");
-        selectedAnimalGenotype.setText("-");
-    }
-
     private void updateSelectedAnimalDetails() {
-        if (selectedAnimal != null) {
+        if (selectedAnimal != null && selectedAnimalIndex != -1) {
             // Sprawdź, czy zwierzak nadal istnieje
-            if (!map.getAnimals().containsKey(selectedAnimal.getPosition())) {
-                clearSelectedAnimalDetails(); // Wyczyść, jeśli zwierzak zniknął
+            boolean isAlive = map.getAnimals().containsKey(selectedAnimal.getPosition());
+            if (!isAlive) {
+                selectedAnimalStatus.setText("Nie żyje");
                 return;
             }
+
+            // Jeśli żyje, wyświetl szczegóły
+            selectedAnimalStatus.setText("Żyje");
 
             AnimalStatistics stats = selectedAnimal.getStatistics();
 
             selectedAnimalPosition.setText(selectedAnimal.getPosition().toString());
             selectedAnimalEnergy.setText(String.valueOf(selectedAnimal.getEnergy())); // Dynamiczna energia
             selectedAnimalChildren.setText(String.valueOf(stats.getChildrenCount())); // Dynamiczna liczba dzieci
-            selectedAnimalLifeLength.setText(String.valueOf(selectedAnimal.getLifeLen())); // Dynamiczna długość życia
+            selectedAnimalLifeLength.setText(String.valueOf(stats.getLifeLen())); // Dynamiczna długość życia
 
             // Genotyp zwierzaka
-            StringBuilder genotypeString = new StringBuilder();
-            for (MoveDirection move : stats.getMoves()) {
-                genotypeString.append(move.ordinal()).append(" ");
+            if (simulation != null) {
+                List<Integer> genotype = simulation.getAnimalGenotype(selectedAnimalIndex);
+                selectedAnimalGenotype.setText(genotype.toString());
+            } else {
+                selectedAnimalGenotype.setText("-");
             }
-            selectedAnimalGenotype.setText(genotypeString.toString().trim());
         }
     }
 
-
-
+    public void setSaveToCSVEnabled(boolean saveToCSVEnabled) {
+        this.saveToCSVEnabled = saveToCSVEnabled;
+    }
 }

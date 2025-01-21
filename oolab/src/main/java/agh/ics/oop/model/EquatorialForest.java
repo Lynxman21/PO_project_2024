@@ -107,17 +107,11 @@ public class EquatorialForest extends AbstractWorldMap {
         }
     }
 
-
-
-
     public int getFreeFieldsCount() {
         int totalFields = width * height; // Całkowita liczba pól na mapie
         int animalsCount = animals.values().stream().mapToInt(List::size).sum(); // Liczba zwierząt na mapie
         return totalFields - animalsCount; // Wolne pola = całkowite pola - liczba zwierząt
     }
-
-
-
 
     @Override
     public void move(Animal animal, MoveDirection direction) {

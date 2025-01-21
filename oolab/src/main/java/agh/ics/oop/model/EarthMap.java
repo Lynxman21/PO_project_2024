@@ -32,16 +32,15 @@ public class EarthMap extends EquatorialForest {
             case FORWARD -> newPosition = oldPosition.add(animal.getDirection().toUnitVector());
             case BACKWARD -> newPosition = oldPosition.add(animal.getDirection().toUnitVector().opposite());
             case LEFT -> {
-                animal.rotate(1); // Obrót w lewo
-                return; // Nie zmieniamy pozycji
+                animal.rotate(7); // Obrót w lewo
+                newPosition = oldPosition.add(animal.getDirection().toUnitVector());
             }
             case RIGHT -> {
-                animal.rotate(-1); // Obrót w prawo
-                return; // Nie zmieniamy pozycji
+                animal.rotate(1); // Obrót w prawo
+                newPosition = oldPosition.add(animal.getDirection().toUnitVector());
             }
         }
 
-        // Wrapowanie w poziomie (lewo-prawo)
         if (newPosition.getX() >= width) {
             newPosition = new Vector2d(0, newPosition.getY()); // Przejście na lewą krawędź
         } else if (newPosition.getX() < 0) {
@@ -132,18 +131,33 @@ public class EarthMap extends EquatorialForest {
         return childGenotype;
     }
 
-
     private void mutateGenotype(List<MoveDirection> genotype, int minMutate, int maxMutate) {
         if (genotype.isEmpty()) {
-            throw new IllegalStateException("Genotype is empty. No mutations applied.");
+            System.err.println("Error: Genotype is empty. No mutations applied.");
+            return;
         }
 
         Random random = new Random();
-        int mutations = random.nextInt(maxMutate - minMutate + 1) + minMutate;
+        int mutations = random.nextInt( (maxMutate-minMutate)+ 1)+minMutate; // Liczba mutacji (od 0 do rozmiaru genotypu)
 
         for (int i = 0; i < mutations; i++) {
-            int mutationIndex = random.nextInt(genotype.size());
-            genotype.set(mutationIndex, MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
+            boolean type = random.nextBoolean();
+            if (type) {
+                int mutationIndex = random.nextInt(genotype.size());
+                genotype.set(mutationIndex, MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
+            }
+            else {
+                int firstIndex = random.nextInt(genotype.size());
+                int secondIndex = random.nextInt(genotype.size());
+
+                while (firstIndex==secondIndex) {
+                    secondIndex = random.nextInt(genotype.size());
+                }
+
+                MoveDirection temp = genotype.get(firstIndex);
+                genotype.set(firstIndex,genotype.get(secondIndex));
+                genotype.set(secondIndex,temp);
+            }
         }
     }
 

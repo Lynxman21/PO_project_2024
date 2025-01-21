@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -51,6 +52,9 @@ public class MainViewPresenter {
 
     @FXML
     private TextField time;
+
+    @FXML
+    private CheckBox saveToCSVSwitch;
 
     public void onSimulationStartClicked(ActionEvent actionEvent) {
         try {
@@ -126,14 +130,21 @@ public class MainViewPresenter {
             simulationStage.setScene(new Scene(loader.load()));
             simulationStage.setTitle("Simulation");
 
+
             // Pobierz kontroler i zainicjalizuj symulację
             SimulationViewPresenter simulationPresenter = loader.getController();
+            simulationPresenter.setSaveToCSVEnabled(saveToCSVSwitch != null && saveToCSVSwitch.isSelected());
             simulationPresenter.initializeSimulation(
                     mapWidth, mapHeight, numberOfAnimals, numberOfPlants,
-                    defaultPlantEnergy,deafultAnimalEnergy,minimumEnergy,
-                    plantPerDayNum,minMutations, maxMutations, genomLength,
-                    energyForNewAnimal,dayTime
+                    defaultPlantEnergy, deafultAnimalEnergy, minimumEnergy,
+                    plantPerDayNum, minMutations, maxMutations, genomLength,
+                    energyForNewAnimal, dayTime
             );
+
+
+            // Przekazanie wartości przełącznika saveToCSVSwitch
+            boolean saveToCSV = saveToCSVSwitch != null && saveToCSVSwitch.isSelected();
+            simulationPresenter.setSaveToCSVEnabled(saveToCSV);
 
             // Otwórz okno symulacji
             simulationStage.show();
