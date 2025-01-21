@@ -32,12 +32,12 @@ public class EarthMap extends EquatorialForest {
             case FORWARD -> newPosition = oldPosition.add(animal.getDirection().toUnitVector());
             case BACKWARD -> newPosition = oldPosition.add(animal.getDirection().toUnitVector().opposite());
             case LEFT -> {
-                animal.rotate(1); // Obrót w lewo
-                return; // Nie zmieniamy pozycji
+                animal.rotate(7); // Obrót w lewo
+                newPosition = oldPosition.add(animal.getDirection().toUnitVector());
             }
             case RIGHT -> {
-                animal.rotate(-1); // Obrót w prawo
-                return; // Nie zmieniamy pozycji
+                animal.rotate(1); // Obrót w prawo
+                newPosition = oldPosition.add(animal.getDirection().toUnitVector());
             }
         }
 
@@ -143,8 +143,14 @@ public class EarthMap extends EquatorialForest {
         int mutations = random.nextInt(genotype.size() + 1); // Liczba mutacji (od 0 do rozmiaru genotypu)
 
         for (int i = 0; i < mutations; i++) {
-            int mutationIndex = random.nextInt(genotype.size());
-            genotype.set(mutationIndex, MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
+            boolean type = random.nextBoolean();
+            if (type) {
+                int mutationIndex = random.nextInt(genotype.size());
+                genotype.set(mutationIndex, MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
+            }
+            else {
+                
+            }
         }
     }
 

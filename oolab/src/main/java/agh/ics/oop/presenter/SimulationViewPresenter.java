@@ -261,4 +261,72 @@ public class SimulationViewPresenter implements MapChangeListener {
         simulationThread.start();
         System.out.println("Simulation initialized and thread started.");
     }
+
+    private boolean isPaused = false;
+
+    @FXML
+    private void handlePauseButtonClick() {
+        isPaused = !isPaused; // Przełącz między pauzą a wznowieniem
+        if (simulation != null) {
+            if (isPaused) {
+                simulation.pause(); // Wstrzymaj symulację
+                pauseButton.setText("Resume");
+            } else {
+                simulation.resume(); // Wznów symulację
+                pauseButton.setText("Pause");
+            }
+        }
+    }
+    private Animal selectedAnimal; // Pole do przechowywania wybranego zwierzaka
+
+    private void handleAnimalClick(Animal animal) {
+        selectedAnimal = animal;
+
+        // Znajdź indeks wybranego zwierzaka w directionSequences
+        if (simulation != null) {
+            selectedAnimalIndex = simulation.getAnimalIndex(animal);
+        }
+
+        updateSelectedAnimalDetails();
+    }
+
+
+
+    private int selectedAnimalIndex = -1; // Indeks wybranego zwierzaka w directionSequences
+
+    private void clearSelectedAnimalDetails() {
+        selectedAnimal = null;
+        selectedAnimalIndex = -1;
+
+        selectedAnimalPosition.setText("-");
+        selectedAnimalEnergy.setText("-");
+        selectedAnimalChildren.setText("-");
+        selectedAnimalLifeLength.setText("-");
+        selectedAnimalGenotype.setText("-");
+    }
+
+    private void updateSelectedAnimalDetails() {
+        if (selectedAnimal != null && selectedAnimalIndex != -1) {
+            // Sprawdź, czy zwierzak nadal istnieje
+            if (!map.getAnimals().containsKey(selectedAnimal.getPosition())) {
+                clearSelectedAnimalDetails(); // Wyczyść, jeśli zwierzak zniknął
+                return;
+            }
+
+            AnimalStatistics stats = selectedAnimal.getStatistics();
+
+            selectedAnimalPosition.setText(selectedAnimal.getPosition().toString());
+            selectedAnimalEnergy.setText(String.valueOf(selectedAnimal.getEnergy())); // Dynamiczna energia
+            selectedAnimalChildren.setText(String.valueOf(stats.getChildrenCount())); // Dynamiczna liczba dzieci
+            selectedAnimalLifeLength.setText(String.valueOf(selectedAnimal.getLifeLen())); // Dynamiczna długość życia
+
+            // Genotyp zwierzaka
+            if (simulation != null) {
+                List<Integer> genotype = simulation.getAnimalGenotype(selectedAnimalIndex);
+                selectedAnimalGenotype.setText(genotype.toString());
+            } else {
+                selectedAnimalGenotype.setText("-");
+            }
+        }
+    }
 }

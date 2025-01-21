@@ -77,9 +77,7 @@ public class Animal implements WorldElement {
     private List<MoveDirection> generateDefaultMoves() {
         Random random = new Random();
         List<MoveDirection> moves = new ArrayList<>();
-        int movesCount = random.nextInt(10) + 5; // Długość genotypu od 5 do 15
-
-        for (int i = 0; i < movesCount; i++) {
+        for (int i = 0; i < genLen; i++) {
             moves.add(MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
         }
 
