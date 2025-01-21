@@ -381,7 +381,7 @@ public class SimulationViewPresenter implements MapChangeListener {
     }
 
     private void updateSelectedAnimalDetails() {
-        if (selectedAnimal != null) {
+        if (selectedAnimal != null && selectedAnimalIndex != -1) {
             // Sprawdź, czy zwierzak nadal istnieje
             if (!map.getAnimals().containsKey(selectedAnimal.getPosition())) {
                 clearSelectedAnimalDetails(); // Wyczyść, jeśli zwierzak zniknął
@@ -396,14 +396,12 @@ public class SimulationViewPresenter implements MapChangeListener {
             selectedAnimalLifeLength.setText(String.valueOf(selectedAnimal.getLifeLen())); // Dynamiczna długość życia
 
             // Genotyp zwierzaka
-            StringBuilder genotypeString = new StringBuilder();
-            for (MoveDirection move : stats.getMoves()) {
-                genotypeString.append(move.ordinal()).append(" ");
+            if (simulation != null) {
+                List<Integer> genotype = simulation.getAnimalGenotype(selectedAnimalIndex);
+                selectedAnimalGenotype.setText(genotype.toString());
+            } else {
+                selectedAnimalGenotype.setText("-");
             }
-            selectedAnimalGenotype.setText(genotypeString.toString().trim());
         }
     }
-
-
-
 }

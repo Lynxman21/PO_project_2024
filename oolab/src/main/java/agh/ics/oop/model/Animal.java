@@ -90,7 +90,8 @@ public class Animal implements WorldElement {
     private List<MoveDirection> generateDefaultMoves(int length) {
         Random random = new Random();
         List<MoveDirection> moves = new ArrayList<>();
-        for (int i = 0; i < length; i++) {
+
+        for (int i = 0; i < genLen; i++) {
             moves.add(MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
         }
         return moves;
