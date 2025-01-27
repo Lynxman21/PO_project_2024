@@ -9,7 +9,7 @@ public class EquatorialForest extends AbstractWorldMap {
     protected final int width;
     protected final int height;
     protected Map<Vector2d, Plant> plants = new HashMap<>();
-    protected final Random random = new Random();
+    protected final Random random = new Random(); // static?
     protected final Set<Vector2d> preferredFields = new HashSet<>();
     protected final Set<Vector2d> nonPreferredFields = new HashSet<>();
 
@@ -114,7 +114,7 @@ public class EquatorialForest extends AbstractWorldMap {
     }
 
     @Override
-    public void move(Animal animal, MoveDirection direction) {
+    public void move(Animal animal, MoveDirection direction) { // pusto tu
     }
 
     @Override
@@ -131,6 +131,6 @@ public class EquatorialForest extends AbstractWorldMap {
 
     @Override
     public Boundary getCurrentBounds() {
-        return new Boundary(new Vector2d(0, 0), new Vector2d(width - 1, height - 1));
+        return new Boundary(new Vector2d(0, 0), new Vector2d(width - 1, height - 1)); // dwa nowe obiekty co wywołanie?
     }
 }

@@ -17,6 +17,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -275,7 +276,7 @@ public class SimulationViewPresenter implements MapChangeListener {
 
         // Aktualizacja szczegółów wybranego zwierzaka
         updateSelectedAnimalDetails();
-    }
+    } // ta metoda jest przerośnięta
 
     // Pomocnicza metoda do obliczenia koloru
     private javafx.scene.paint.Color getColorForEnergy(int energy) {
@@ -290,7 +291,7 @@ public class SimulationViewPresenter implements MapChangeListener {
 
     public void initializeSimulation(
             int mapWidth, int mapHeight, int numberOfAnimals, int numberOfPlants,
-            int plantEnergy, int animalEnergy, int minEnergy, int plantPerDay,int minMutations, int maxMutations,
+            int plantEnergy, int animalEnergy, int minEnergy, int plantPerDay, int minMutations, int maxMutations,
             int genomLength, int energyForChild, int time
     ) {
         this.minEnergy = minEnergy; // Przypisanie minEnergy w SimulationViewPresenter
@@ -327,7 +328,7 @@ public class SimulationViewPresenter implements MapChangeListener {
 
         simulation = new Simulation(
                 startPositions, directionSequences, map, plantEnergy, animalEnergy,
-                minEnergy, mapWidth, mapHeight, plantPerDay, statistics, minMutations,maxMutations,genomLength,
+                minEnergy, mapWidth, mapHeight, plantPerDay, statistics, minMutations, maxMutations, genomLength,
                 energyForChild, time
         );
         statistics.setSimulation(simulation);

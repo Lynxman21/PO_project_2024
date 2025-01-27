@@ -51,7 +51,7 @@ public interface WorldMap extends agh.ics.oop.model.MoveValidator {
      */
     WorldElement objectAt(Vector2d position);
 
-    void removeAnimal(Vector2d position,Animal animal);
+    void removeAnimal(Vector2d position, Animal animal);
 
     Map<Vector2d, List<Animal>> getAnimals();
 }

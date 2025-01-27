@@ -1,0 +1,14 @@
+Day  ;  Animal Count  ;  Plant Count  ;  Empty Cells  ;  Most Common Genotype  ;  Average Energy  ;  Average Life Length  ;  Average Children Count
+38  ;  8  ;  54  ;  217  ;  None  ;  432  ;  0  ;  1
+
+Details of Animals:
+
+Animal Status  ;  Position  ;  Energy  ;  Children Count  ;  Life Length  ;  Genotype
+Alive  ;  (12,4)  ;  201  ;  0  ;  38  ;  [6, 6, 5, 5, 3, 6, 6, 2]
+Alive  ;  (0,10)  ;  801  ;  0  ;  38  ;  [7, 2, 0, 3, 7, 5, 5, 1]
+Alive  ;  (8,5)  ;  141  ;  0  ;  38  ;  [0, 6, 6, 7, 2, 4, 3, 4]
+Alive  ;  (4,8)  ;  301  ;  0  ;  38  ;  [3, 5, 4, 4, 7, 1, 7, 7]
+Alive  ;  (11,8)  ;  561  ;  0  ;  38  ;  [1, 5, 0, 2, 3, 2, 4, 2]
+Alive  ;  (14,3)  ;  441  ;  0  ;  38  ;  [4, 6, 1, 7, 0, 3, 3, 1]
+Alive  ;  (7,1)  ;  571  ;  0  ;  29  ;  [6, 0, 5, 5, 2, 5, 2, 0]
+Alive  ;  (1,6)  ;  439  ;  0  ;  21  ;  [1, 6, 3, 1, 4, 5, 3, 2]

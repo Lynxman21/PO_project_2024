@@ -6,10 +6,10 @@ import agh.ics.oop.model.util.MapVisualizer;
 
 import java.util.*;
 
-public abstract class AbstractWorldMap implements WorldMap{
-    protected Map<Vector2d,List<Animal>> animals = new HashMap<>();
-    protected List<MapChangeListener>observers;
-    protected MapVisualizer vizulizer;
+public abstract class AbstractWorldMap implements WorldMap {
+    protected Map<Vector2d, List<Animal>> animals = new HashMap<>();
+    protected List<MapChangeListener> observers;
+    protected MapVisualizer vizulizer; // literówka
     protected final int id;
     protected final int width;
     protected final int height;
@@ -36,7 +36,7 @@ public abstract class AbstractWorldMap implements WorldMap{
 
     public abstract void growPlants();
 
-    public abstract void growPlants(int initialCount,int energy);
+    public abstract void growPlants(int initialCount, int energy);
 
     @Override
     public int getId() {
@@ -49,7 +49,7 @@ public abstract class AbstractWorldMap implements WorldMap{
 
     protected void informObservers(String message) {
         for (MapChangeListener observer : observers) {
-            observer.mapChanged(this,message);
+            observer.mapChanged(this, message);
         }
     }
 
@@ -65,7 +65,7 @@ public abstract class AbstractWorldMap implements WorldMap{
     }
 
     public Map<Vector2d, Plant> getPlants() {
-        throw new UnsupportedOperationException("Plants are not supported on this map type.");
+        throw new UnsupportedOperationException("Plants are not supported on this map type."); // ?
     }
 
     @Override
@@ -88,7 +88,7 @@ public abstract class AbstractWorldMap implements WorldMap{
             animal.incrementEnergy(plant.getEnergyValue()); // Zwierzę zyskuje energię
 
             // Usuwanie drzewa
-            if (plant.isLarge()) {
+            if (plant.isLarge()) { // nie da się tego zrobić lepiej niż if'em?
                 // Jeśli duże drzewo, usuń wszystkie jego części
                 for (Vector2d area : plant.getArea()) {
                     plants.remove(area);
@@ -124,7 +124,7 @@ public abstract class AbstractWorldMap implements WorldMap{
 
     public String toString() {
         Boundary boundary = this.getCurrentBounds();
-        return vizulizer.draw(boundary.lowerLeft(),boundary.upperRight());
+        return vizulizer.draw(boundary.lowerLeft(), boundary.upperRight());
     }
 
     public abstract Boundary getCurrentBounds();

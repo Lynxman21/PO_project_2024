@@ -13,20 +13,20 @@ import java.util.List;
 
 public class Simulation implements Runnable {
     private final List<Animal> animals;
-    private final List<List<Integer>> directionSequences; // Sekwencje ruchów dla każdego zwierzaka
+    private final List<List<Integer>> directionSequences; // Sekwencje ruchów dla każdego zwierzaka // czy to jest używane?
     private final WorldMap map;
     private final int plantEnergy;
     private final int animalEnergy;
-    private final int minEnergy;
+    private final int minEnergy; // czy to cecha symulacji?
     private final Statistics statistics;
     private volatile boolean running = true;
     private final int dailyPlantCount;
-    private final int minMutations;
+    private final int minMutations; // czy to cecha symulacji?
     private final int maxMutations;
     private final int genomLength;
     private final int energyForChild;
     private final int time;
-    private Animal selectedAnimal;
+    private Animal selectedAnimal; // czy to cecha symulacji?
     private final List<Animal> allAnimals = new ArrayList<>();
     private volatile boolean paused = false;
 
@@ -62,8 +62,8 @@ public class Simulation implements Runnable {
                     animals.add(animal); // Dodaj zwierzę do listy zwierząt
                     allAnimals.add(animal); // Dodaj do listy wszystkich zwierząt
                     System.out.println(animalEnergy);
-                } catch (IncorrectPositionException e) {
-                    System.out.println("Error placing animal at " + position + ": " + e.getMessage());
+                } catch (IncorrectPositionException e) { // czy to się może wydarzyć?
+                    System.out.println("Error placing animal at " + position + ": " + e.getMessage()); // czy to dobry wybór?
                 }
             } else {
                 System.out.println("Position " + position + " is already occupied.");
@@ -94,7 +94,7 @@ public class Simulation implements Runnable {
                         wait(); // Czekaj, aż pauza zostanie wyłączona
                     } catch (InterruptedException e) {
                         System.out.println("Simulation interrupted during pause.");
-                        Thread.currentThread().interrupt();
+                        Thread.currentThread().interrupt(); // jaki jest sens wysyłać interrupt sobie samemu?
                         return;
                     }
                 }
@@ -107,7 +107,7 @@ public class Simulation implements Runnable {
                     List<Integer> directions = directionSequences.get(i);
 
                     if (directions.isEmpty()) {
-                        System.err.println("Error: Direction sequence is unexpectedly empty for animal at index " + i);
+                        System.err.println("Error: Direction sequence is unexpectedly empty for animal at index " + i); // czy to się kwalifikuje na printa?
                         continue;
                     }
 
@@ -212,11 +212,11 @@ public class Simulation implements Runnable {
 
                     // Debug: Informacja o nowo narodzonym zwierzęciu
                     System.out.println("New animal born at " + child.getPosition() + " with energy: " + child.getEnergy());
-                } catch (IncorrectPositionException e) {
+                } catch (IncorrectPositionException e) { // czy to się może wydarzyć?
                     System.err.println("Error placing animal: " + e.getMessage());
                 }
             } else {
-                System.err.println("Reproduction is not supported on this map type.");
+                System.err.println("Reproduction is not supported on this map type."); // ?
             }
         }
     }
@@ -231,6 +231,7 @@ public class Simulation implements Runnable {
         notify(); // Powiadom wątek, aby kontynuował
         System.out.println("Simulation resumed.");
     }
+
     public List<Animal> getAllAnimals() {
         return allAnimals;
     }

@@ -9,10 +9,10 @@ public class Plant implements WorldElement {
     private final int energy;
     private final boolean isMainPart; // Określa, czy to główna część dużego drzewa
 
-    public Plant(Vector2d position, boolean isLarge,int energy) {
+    public Plant(Vector2d position, boolean isLarge, int energy) {
         this.position = position;
         this.isLarge = isLarge;
-        this.energy = isLarge ? energy+20 : energy;
+        this.energy = isLarge ? energy + 20 : energy;
         this.isMainPart = !isLarge || position.equals(calculateMainPosition(position));
     }
 

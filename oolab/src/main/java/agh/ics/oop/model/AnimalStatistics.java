@@ -6,7 +6,8 @@ public class AnimalStatistics {
     private int energy;
     private int lifeLen;
     private int childrenCount;
-    private List<MoveDirection> moves; // Genotyp
+    private List<MoveDirection> moves; // Genotyp // czyli statystyka zna genotyp zwierzęcia, a ono samo go nie zna?
+
 
     public AnimalStatistics(int energy, List<MoveDirection> moves) {
         this.energy = energy;

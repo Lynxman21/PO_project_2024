@@ -148,9 +148,9 @@ public class MainViewPresenter {
 
             // Otwórz okno symulacji
             simulationStage.show();
-        } catch (Exception e) {
+        } catch (Exception e) { // catch co?
             e.printStackTrace();
             infoLabel.setText("Unexpected error occurred.");
         }
-    }
+    } // ta metoda jest przerośnięta
 }

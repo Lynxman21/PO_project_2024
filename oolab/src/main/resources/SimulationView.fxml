@@ -9,13 +9,14 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<BorderPane minHeight="750.0" minWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.presenter.SimulationViewPresenter" >
+<BorderPane minHeight="750.0" minWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.presenter.SimulationViewPresenter">
     <top>
-        <Label fx:id="infoLabel" text="Simulation running..." textAlignment="CENTER" />
+        <Label fx:id="infoLabel" text="Simulation running..." textAlignment="CENTER"/>
     </top>
     <center>
         <VBox>
-            <GridPane fx:id="mapGrid" gridLinesVisible="true" prefHeight="800" prefWidth="800" />
+            <GridPane fx:id="mapGrid" gridLinesVisible="true" prefHeight="800" prefWidth="800"/>
 
 
         </VBox>
@@ -23,66 +24,66 @@
     <right>
         <VBox prefHeight="800.0" prefWidth="400.0" BorderPane.alignment="CENTER" spacing="10">
             <padding>
-                <Insets top="0" right="0" bottom="0" left="20" />
+                <Insets top="0" right="0" bottom="0" left="20"/>
             </padding>
-            <Button fx:id="pauseButton" text="Pauza" onAction="#handlePauseButtonClick" />
+            <Button fx:id="pauseButton" text="Pauza" onAction="#handlePauseButtonClick"/>
             <HBox spacing="5">
-                <Label text="Dzień:" />
-                <Label fx:id="dayDisplay" />
+                <Label text="Dzień:"/>
+                <Label fx:id="dayDisplay"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Liczba zwierząt:" />
-                <Label fx:id="animalCountDisplay" />
+                <Label text="Liczba zwierząt:"/>
+                <Label fx:id="animalCountDisplay"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Liczba roślin:" />
-                <Label fx:id="plantDisplay" />
+                <Label text="Liczba roślin:"/>
+                <Label fx:id="plantDisplay"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Liczba wolnych pól:" />
-                <Label fx:id="emptyCellsDisplay" />
+                <Label text="Liczba wolnych pól:"/>
+                <Label fx:id="emptyCellsDisplay"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Najpopularniejszy genotyp:" />
-                <Label fx:id="mostCommonGenomDisplay" wrapText="true" />
+                <Label text="Najpopularniejszy genotyp:"/>
+                <Label fx:id="mostCommonGenomDisplay" wrapText="true"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Średni poziom energii:" />
-                <Label fx:id="averageEnergyDisplay" />
+                <Label text="Średni poziom energii:"/>
+                <Label fx:id="averageEnergyDisplay"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Średnia długość życia:" />
-                <Label fx:id="averageLifeDisplay" />
+                <Label text="Średnia długość życia:"/>
+                <Label fx:id="averageLifeDisplay"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Średnia liczba dzieci:" />
-                <Label fx:id="averageChildrenCountDisplay" />
+                <Label text="Średnia liczba dzieci:"/>
+                <Label fx:id="averageChildrenCountDisplay"/>
             </HBox>
 
-            <Label text="Szczegółowe informacje zwierzaka:" style="-fx-font-weight: bold;" />
+            <Label text="Szczegółowe informacje zwierzaka:" style="-fx-font-weight: bold;"/>
             <HBox spacing="5">
-                <Label text="Status:" />
-                <Label fx:id="selectedAnimalStatus" />
+                <Label text="Status:"/>
+                <Label fx:id="selectedAnimalStatus"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Aktualna pozycja:" />
-                <Label fx:id="selectedAnimalPosition" />
+                <Label text="Aktualna pozycja:"/>
+                <Label fx:id="selectedAnimalPosition"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Energia:" />
-                <Label fx:id="selectedAnimalEnergy" />
+                <Label text="Energia:"/>
+                <Label fx:id="selectedAnimalEnergy"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Dzieci:" />
-                <Label fx:id="selectedAnimalChildren" />
+                <Label text="Dzieci:"/>
+                <Label fx:id="selectedAnimalChildren"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Długość życia:" />
-                <Label fx:id="selectedAnimalLifeLength" />
+                <Label text="Długość życia:"/>
+                <Label fx:id="selectedAnimalLifeLength"/>
             </HBox>
             <HBox spacing="5">
-                <Label text="Genotyp:" />
-                <Label fx:id="selectedAnimalGenotype" wrapText="true" />
+                <Label text="Genotyp:"/>
+                <Label fx:id="selectedAnimalGenotype" wrapText="true"/>
             </HBox>
         </VBox>
     </right>

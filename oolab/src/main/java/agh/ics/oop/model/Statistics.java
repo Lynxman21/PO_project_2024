@@ -1,4 +1,4 @@
-package agh.ics.oop.model;
+package agh.ics.oop.model; // czy to na pewno model?
 
 import agh.ics.oop.Simulation;
 import agh.ics.oop.model.Animal;
@@ -149,10 +149,12 @@ public class Statistics {
         if (animalCountDisplay != null) animalCountDisplay.setText(String.valueOf(animalCount));
         if (plantDisplay != null) plantDisplay.setText(String.valueOf(plantCount));
         if (emptyCellsDisplay != null) emptyCellsDisplay.setText(String.valueOf(emptyCells));
-        if (mostCommonGenomDisplay != null) mostCommonGenomDisplay.setText(mostCommonGenom != null ? mostCommonGenom.toString() : "None");
+        if (mostCommonGenomDisplay != null)
+            mostCommonGenomDisplay.setText(mostCommonGenom != null ? mostCommonGenom.toString() : "None");
         if (averageEnergyDisplay != null) averageEnergyDisplay.setText(String.valueOf(averageEnergy));
         if (averageLifeDisplay != null) averageLifeDisplay.setText(String.valueOf(averageLifeLen));
-        if (averageChildrenCountDisplay != null) averageChildrenCountDisplay.setText(String.valueOf(averageCountOfChildren));
+        if (averageChildrenCountDisplay != null)
+            averageChildrenCountDisplay.setText(String.valueOf(averageCountOfChildren));
     }
 
     public void updateEmptyFields(EquatorialForest forest) {

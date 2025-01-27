@@ -9,65 +9,68 @@
 <?import javafx.scene.layout.VBox?>
 
 <?import javafx.scene.control.CheckBox?>
-<BorderPane minHeight="550.0" minWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.presenter.MainViewPresenter">
+<BorderPane minHeight="550.0" minWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="agh.ics.oop.presenter.MainViewPresenter">
     <center>
         <VBox alignment="CENTER" spacing="10" BorderPane.alignment="CENTER">
             <HBox alignment="CENTER" spacing="10">
-                <Label prefHeight="17.0" prefWidth="94.0" text="Szerokość mapy:" />
-                <TextField fx:id="mapWidthField" promptText="Width" text="15" />
-                <Label prefHeight="17.0" prefWidth="95.0" text="Wysokość mapy:" />
-                <TextField fx:id="mapHeightField" promptText="Height" text="15" />
+                <Label prefHeight="17.0" prefWidth="94.0" text="Szerokość mapy:"/>
+                <TextField fx:id="mapWidthField" promptText="Width" text="15"/>
+                <Label prefHeight="17.0" prefWidth="95.0" text="Wysokość mapy:"/>
+                <TextField fx:id="mapHeightField" promptText="Height" text="15"/>
             </HBox>
             <HBox alignment="CENTER" spacing="10">
-                <Label prefHeight="17.0" prefWidth="89.0" text="Liczba zwierząt:" />
-                <TextField fx:id="animalCountField" prefHeight="25.0" prefWidth="140.0" promptText="Number of animals" text="6" />
-                <Label prefHeight="17.0" prefWidth="74.0" text="Liczba roślin:" />
-                <TextField fx:id="plantCountField" promptText="Number of plants" text="8" />
+                <Label prefHeight="17.0" prefWidth="89.0" text="Liczba zwierząt:"/>
+                <TextField fx:id="animalCountField" prefHeight="25.0" prefWidth="140.0" promptText="Number of animals"
+                           text="6"/>
+                <Label prefHeight="17.0" prefWidth="74.0" text="Liczba roślin:"/>
+                <TextField fx:id="plantCountField" promptText="Number of plants" text="8"/>
             </HBox>
             <HBox alignment="CENTER" prefHeight="39.0" prefWidth="850.0" spacing="10.0">
-                <Label prefHeight="23.0" prefWidth="165.0" text="Wartość energetyczna rośliny:" />
-                <TextField fx:id="plantEnergy" prefHeight="25.0" prefWidth="134.0" text="20" />
+                <Label prefHeight="23.0" prefWidth="165.0" text="Wartość energetyczna rośliny:"/>
+                <TextField fx:id="plantEnergy" prefHeight="25.0" prefWidth="134.0" text="20"/>
                 <Label prefHeight="21.0" prefWidth="153.0" text="Energia startowa zwierzęcia:">
                     <HBox.margin>
-                        <Insets />
-                    </HBox.margin></Label>
-                <TextField fx:id="animalEnergy" text="59" />
+                        <Insets/>
+                    </HBox.margin>
+                </Label>
+                <TextField fx:id="animalEnergy" text="59"/>
             </HBox>
             <HBox alignment="CENTER" prefHeight="52.0" prefWidth="850.0" spacing="10.0">
-                <Label prefHeight="23.0" prefWidth="196.0" text="Minimalna energia do rozmnażania:" />
-                <TextField fx:id="minEnergy" prefHeight="25.0" prefWidth="162.0" text="20" />
-                <Label prefHeight="25.0" prefWidth="149.0" text="Liczba wyrastających roślin: " />
-                <TextField fx:id="plantPerDay" text="3" />
+                <Label prefHeight="23.0" prefWidth="196.0" text="Minimalna energia do rozmnażania:"/>
+                <TextField fx:id="minEnergy" prefHeight="25.0" prefWidth="162.0" text="20"/>
+                <Label prefHeight="25.0" prefWidth="149.0" text="Liczba wyrastających roślin: "/>
+                <TextField fx:id="plantPerDay" text="3"/>
             </HBox>
             <HBox alignment="CENTER" prefHeight="53.0" prefWidth="850.0" spacing="10.0">
                 <children>
-                    <Label prefHeight="17.0" prefWidth="141.0" text="minimalna liczba mutacji: " />
-                    <TextField fx:id="minMutationNumber" text="0" />
-                    <Label prefHeight="17.0" prefWidth="148.0" text="maxymalna liczba mutacji: " />
-                    <TextField fx:id="maxMutationNumber" text="10" />
+                    <Label prefHeight="17.0" prefWidth="141.0" text="minimalna liczba mutacji: "/>
+                    <TextField fx:id="minMutationNumber" text="0"/>
+                    <Label prefHeight="17.0" prefWidth="148.0" text="maxymalna liczba mutacji: "/>
+                    <TextField fx:id="maxMutationNumber" text="10"/>
                 </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="850.0" spacing="10.0">
                 <children>
-                    <Label text="Długość genomu: " />
-                    <TextField fx:id="genomLen" text="20" />
-                    <Label prefHeight="17.0" prefWidth="194.0" text="Energia przeznaczana dla potomka: " />
-                    <TextField fx:id="energyForChild" text="20" />
+                    <Label text="Długość genomu: "/>
+                    <TextField fx:id="genomLen" text="20"/>
+                    <Label prefHeight="17.0" prefWidth="194.0" text="Energia przeznaczana dla potomka: "/>
+                    <TextField fx:id="energyForChild" text="20"/>
                 </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="850.0" spacing="10.0">
                 <children>
-                    <Label text="Prędkość symulacji [ms]:" />
-                    <TextField fx:id="time" text="1000" />
+                    <Label text="Prędkość symulacji [ms]:"/>
+                    <TextField fx:id="time" text="1000"/>
                 </children>
             </HBox>
             <HBox alignment="CENTER" spacing="10">
-                <Label text="Zapisz do CSV:" />
-                <CheckBox fx:id="saveToCSVSwitch" selected="false" />
+                <Label text="Zapisz do CSV:"/>
+                <CheckBox fx:id="saveToCSVSwitch" selected="false"/>
             </HBox>
 
-            <Button onAction="#onSimulationStartClicked" text="Start Simulation" />
-            <Label fx:id="infoLabel" text="Enter simulation parameters above and click Start" textAlignment="CENTER" />
+            <Button onAction="#onSimulationStartClicked" text="Start Simulation"/>
+            <Label fx:id="infoLabel" text="Enter simulation parameters above and click Start" textAlignment="CENTER"/>
         </VBox>
     </center>
 </BorderPane>

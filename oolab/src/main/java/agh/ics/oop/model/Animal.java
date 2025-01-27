@@ -13,7 +13,7 @@ public class Animal implements WorldElement {
     private final int genLen;
     private AnimalStatistics statistics; // Przechowuje statystyki
 
-    public Animal(Vector2d position,int energy,int genLen) {
+    public Animal(Vector2d position, int energy, int genLen) {
         this.direction = MapDirection.NORTH;
         this.position = position;
         this.energy = energy;
@@ -28,7 +28,7 @@ public class Animal implements WorldElement {
         return statistics;
     }
 
-    public void setStatistics(AnimalStatistics statistics) {
+    public void setStatistics(AnimalStatistics statistics) { // tak po prostu?
         this.statistics = statistics;
     }
 
@@ -41,7 +41,7 @@ public class Animal implements WorldElement {
         childrenCount++;
     }
 
-    public MoveDirection getMostCommonGenom() {
+    public MoveDirection getMostCommonGenom() { // po co?
         // Mapa do zliczania wystąpień każdego kierunku
         Map<MoveDirection, Integer> frequencyMap = new HashMap<>();
 
@@ -94,13 +94,14 @@ public class Animal implements WorldElement {
     }
 
     public Animal() {
-        this(new Vector2d(2,2),10,10);
+        this(new Vector2d(2, 2), 10, 10);
     }
 
     @Override
     public String toString() {
         return this.direction.toString();
     }
+
     public boolean isAt(Vector2d position) {
         return this.position.equals(position);
     }
@@ -118,7 +119,7 @@ public class Animal implements WorldElement {
     }
 
     public void rotate(int count) {
-        for (int index=0;index<count;index++) {
+        for (int index = 0; index < count; index++) {
             direction = direction.next();
         }
     }
@@ -134,7 +135,7 @@ public class Animal implements WorldElement {
         Vector2d newPosition = this.position.add(this.direction.toUnitVector());
 
         // Odbijanie w pionie (góra-dół)
-        if (newPosition.getY() >= mapHeight || newPosition.getY() < 0) {
+        if (newPosition.getY() >= mapHeight || newPosition.getY() < 0) { // czy to zadanie dla zwierzęcia?
             this.direction = this.direction.opposite(); // Obrót o 180°
             newPosition = this.position.add(this.direction.toUnitVector()); // Oblicz nową pozycję po odbiciu
         }

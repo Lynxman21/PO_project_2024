@@ -28,7 +28,7 @@ public class EarthMap extends EquatorialForest {
         Vector2d newPosition = oldPosition;          // Nowa pozycja
 
         // Oblicz nową pozycję na podstawie kierunku
-        switch (direction) {
+        switch (direction) { // czy to jest zadanie dla mapy?
             case FORWARD -> newPosition = oldPosition.add(animal.getDirection().toUnitVector());
             case BACKWARD -> newPosition = oldPosition.add(animal.getDirection().toUnitVector().opposite());
             case LEFT -> {
@@ -78,7 +78,7 @@ public class EarthMap extends EquatorialForest {
         // Sprawdź, czy na nowej pozycji jest roślina
         Plant plant = plants.get(newPosition);
         if (plant != null) {
-            manager.plantConsume(animal, plant); // Zwierzę konsumuje roślinę
+            manager.plantConsume(animal, plant); // Zwierzę konsumuje roślinę // już teraz? a jak przyjdzie silniejsze?
         }
 
         // Zmniejsz energię zwierzęcia za ruch
@@ -89,12 +89,12 @@ public class EarthMap extends EquatorialForest {
             this.removeAnimal(newPosition, animal);
         }
 
-        informObservers("");
-    }
+        informObservers(""); // ?
+    } // ta metoda jest przerośnięta
 
     @Override
     public boolean canMoveTo(Vector2d position) {
-        return true; // Możliwość wejścia na dowolne pole
+        return true; // Możliwość wejścia na dowolne pole // to po co w ogóle jest ta metoda?
     }
 
     @Override
@@ -102,7 +102,7 @@ public class EarthMap extends EquatorialForest {
         return animals.containsKey(position) || plants.containsKey(position); // Sprawdza zajętość przez zwierzęta i rośliny
     }
 
-    private List<MoveDirection> createChildGenotype(Animal parent1, Animal parent2, double ratioParent1) {
+    private List<MoveDirection> createChildGenotype(Animal parent1, Animal parent2, double ratioParent1) { // czy to jest zadanie dla mapy?
         List<MoveDirection> moves1 = parent1.getMoves();
         List<MoveDirection> moves2 = parent2.getMoves();
 
@@ -113,7 +113,7 @@ public class EarthMap extends EquatorialForest {
         int breakpoint2 = size2 - breakpoint1;
 
         List<MoveDirection> childGenotype = new ArrayList<>();
-        Random random = new Random();
+        Random random = new Random(); // nowy obiekt co wywołanie?
 
         // Losuj stronę podziału: true -> moves1 z lewej, false -> moves2 z lewej
         boolean moves1Left = random.nextBoolean();
@@ -138,25 +138,24 @@ public class EarthMap extends EquatorialForest {
         }
 
         Random random = new Random();
-        int mutations = random.nextInt( (maxMutate-minMutate)+ 1)+minMutate; // Liczba mutacji (od 0 do rozmiaru genotypu)
+        int mutations = random.nextInt((maxMutate - minMutate) + 1) + minMutate; // Liczba mutacji (od 0 do rozmiaru genotypu)
 
         for (int i = 0; i < mutations; i++) {
             boolean type = random.nextBoolean();
             if (type) {
                 int mutationIndex = random.nextInt(genotype.size());
                 genotype.set(mutationIndex, MoveDirection.values()[random.nextInt(MoveDirection.values().length)]);
-            }
-            else {
+            } else {
                 int firstIndex = random.nextInt(genotype.size());
                 int secondIndex = random.nextInt(genotype.size());
 
-                while (firstIndex==secondIndex) {
+                while (firstIndex == secondIndex) {
                     secondIndex = random.nextInt(genotype.size());
                 }
 
                 MoveDirection temp = genotype.get(firstIndex);
-                genotype.set(firstIndex,genotype.get(secondIndex));
-                genotype.set(secondIndex,temp);
+                genotype.set(firstIndex, genotype.get(secondIndex));
+                genotype.set(secondIndex, temp);
             }
         }
     }
@@ -167,7 +166,7 @@ public class EarthMap extends EquatorialForest {
 
         // Stwórz genotyp dziecka
         List<MoveDirection> childGenotype = createChildGenotype(parent1, parent2, ratioParent1);
-        mutateGenotype(childGenotype,minMutate,maxMutate);
+        mutateGenotype(childGenotype, minMutate, maxMutate);
 
         // Rodzice tracą energię na rzecz dziecka
         parent1.incrementEnergy(-minEnergy);

@@ -20,7 +20,7 @@ public class SimulationApp extends javafx.application.Application {
         loader.setLocation(getClass().getClassLoader().getResource("MainView.fxml"));
         BorderPane viewRoot = loader.load();
         MainViewPresenter presenter = loader.getController();
-        configureStage(primaryStage,viewRoot);
+        configureStage(primaryStage, viewRoot);
         primaryStage.show();
     }
 
