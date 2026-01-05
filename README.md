@@ -39,7 +39,7 @@ Reproduction is processed after all creatures move for choosing the two stronges
 ## How to run the project
 ```bash
 git clone https://github.com/Lynxman21/PO_project_2024.git
-cd PO_project_2024
+cd PO_project_2024/oolab
 ./gradlew run
 ```
 
